@@ -1,0 +1,138 @@
+{
+  "students": [
+    {
+      "id": "STU001",
+      "name": "Arjun Sharma",
+      "email": "arjun.sharma@student.edu",
+      "phone": "+91-9876543210",
+      "course": "B.Tech Computer Science",
+      "year": 2,
+      "admission_date": "2024-08-15",
+      "fee_status": {
+        "total_fee": 85000,
+        "paid": 60000,
+        "pending": 25000,
+        "due_date": "2025-10-15"
+      },
+      "hostel": {
+        "allocated": true,
+        "room_number": "A-201",
+        "floor": 2,
+        "building": "Boys Hostel A"
+      },
+      "documents": {
+        "verified": true,
+        "pending": []
+      }
+    },
+    {
+      "id": "STU002",
+      "name": "Priya Patel",
+      "email": "priya.patel@student.edu",
+      "phone": "+91-9876543211",
+      "course": "B.Tech Electronics",
+      "year": 1,
+      "admission_date": "2025-07-20",
+      "fee_status": {
+        "total_fee": 80000,
+        "paid": 80000,
+        "pending": 0,
+        "due_date": "2025-12-15"
+      },
+      "hostel": {
+        "allocated": true,
+        "room_number": "B-105",
+        "floor": 1,
+        "building": "Girls Hostel B"
+      },
+      "documents": {
+        "verified": true,
+        "pending": []
+      }
+    }
+  ],
+  "dashboard_metrics": {
+    "total_students": 1250,
+    "applications_pending": 45,
+    "fee_collection_today": 125000,
+    "hostel_occupancy": {
+      "total_rooms": 500,
+      "occupied": 430,
+      "available": 70,
+      "occupancy_rate": 86
+    },
+    "recent_activities": [
+      {
+        "time": "10:30 AM",
+        "activity": "New application submitted - Rajesh Kumar"
+      },
+      {
+        "time": "11:15 AM",
+        "activity": "Fee payment received - Priya Patel (\u20b940,000)"
+      },
+      {
+        "time": "12:00 PM",
+        "activity": "Hostel room allocated - Room A-301"
+      },
+      {
+        "time": "02:30 PM",
+        "activity": "Document verification completed - 5 students"
+      }
+    ]
+  },
+  "fee_analytics": {
+    "monthly_collection": [
+      {
+        "month": "Jan",
+        "collected": 2500000
+      },
+      {
+        "month": "Feb",
+        "collected": 2800000
+      },
+      {
+        "month": "Mar",
+        "collected": 2600000
+      },
+      {
+        "month": "Apr",
+        "collected": 3200000
+      },
+      {
+        "month": "May",
+        "collected": 2900000
+      },
+      {
+        "month": "Jun",
+        "collected": 3100000
+      }
+    ],
+    "payment_methods": {
+      "online_banking": 45,
+      "upi": 35,
+      "credit_card": 15,
+      "cash": 5
+    }
+  },
+  "hostel_analytics": {
+    "room_types": {
+      "single": {
+        "total": 100,
+        "occupied": 85
+      },
+      "double": {
+        "total": 300,
+        "occupied": 260
+      },
+      "triple": {
+        "total": 100,
+        "occupied": 85
+      }
+    },
+    "maintenance_requests": {
+      "pending": 12,
+      "in_progress": 8,
+      "completed": 45
+    }
+  }
+}

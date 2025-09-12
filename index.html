@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Student Management System - Smart India Hackathon 2025</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-card card">
+                <div class="card__body">
+                    <div class="login-header">
+                        <h2>ERP Student Management System</h2>
+                        <p>Smart India Hackathon 2025</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label class="form-label">Select Role</label>
+                            <select id="role-select" class="form-control" required>
+                                <option value="">Choose your role</option>
+                                <option value="admin">Administrator</option>
+                                <option value="staff">Staff Member</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" id="username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="page">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>ERP Student Management</span>
+            </div>
+            <div class="navbar-menu">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-menu" id="sidebar-menu">
+                <!-- Menu items will be populated by JavaScript based on role -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" class="content-section">
+                <div class="dashboard-header">
+                    <h1>Administrator Dashboard</h1>
+                    <p>Real-time institutional overview</p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card card">
+                        <div class="card__body">
+                            <div class="metric-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="total-students">0</h3>
+                                <p>Total Students</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card card">
+                        <div class="card__body">
+                            <div class="metric-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="pending-applications">0</h3>
+                                <p>Pending Applications</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card card">
+                        <div class="card__body">
+                            <div class="metric-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="today-collection">₹0</h3>
+                                <p>Today's Collection</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card card">
+                        <div class="card__body">
+                            <div class="metric-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="hostel-occupancy">0%</h3>
+                                <p>Hostel Occupancy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="chart-section card">
+                        <div class="card__header">
+                            <h3>Fee Collection Analytics</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="fee-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="activity-section card">
+                        <div class="card__header">
+                            <h3>Recent Activities</h3>
+                        </div>
+                        <div class="card__body">
+                            <div id="activity-feed" class="activity-feed">
+                                <!-- Activities will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="architecture-section card">
+                    <div class="card__header">
+                        <h3>ERP System Architecture</h3>
+                    </div>
+                    <div class="card__body">
+                        <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/870a0d95a054a2638ece6fdcf2768192/789a0560-2d51-43de-8472-bffb4312644a/8fe50c3e.png" alt="ERP System Architecture" class="architecture-diagram">
+                        <p class="architecture-description">Multi-tier cloud-based design with integrated Google Workspace and Microsoft 365 APIs</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admission Management -->
+            <div id="admission-management" class="content-section">
+                <div class="section-header">
+                    <h1>Admission Management</h1>
+                    <button class="btn btn--primary" id="new-application-btn">
+                        <i class="fas fa-plus"></i> New Application
+                    </button>
+                </div>
+
+                <div class="workflow-section card">
+                    <div class="card__header">
+                        <h3>Student Management Workflow</h3>
+                    </div>
+                    <div class="card__body">
+                        <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/870a0d95a054a2638ece6fdcf2768192/bfa6d785-2eaf-49c5-87bb-1fef11f24264/e64444c3.png" alt="Student Workflow" class="workflow-diagram">
+                        <p class="workflow-description">End-to-end automated process flow from application to enrollment</p>
+                    </div>
+                </div>
+
+                <div class="applications-table-container card">
+                    <div class="card__header">
+                        <h3>Recent Applications</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="table-responsive">
+                            <table id="applications-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Merit Score</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Table data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fee Management -->
+            <div id="fee-management" class="content-section">
+                <div class="section-header">
+                    <h1>Fee Management</h1>
+                    <button class="btn btn--primary" id="process-payment-btn">
+                        <i class="fas fa-credit-card"></i> Process Payment
+                    </button>
+                </div>
+
+                <div class="fee-analytics-grid">
+                    <div class="payment-methods card">
+                        <div class="card__header">
+                            <h3>Payment Methods Distribution</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 250px;">
+                                <canvas id="payment-methods-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fee-status card">
+                        <div class="card__header">
+                            <h3>Fee Collection Status</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="fee-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Collected</span>
+                                    <span class="stat-value">₹18,100,000</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Pending</span>
+                                    <span class="stat-value">₹2,150,000</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Defaulters</span>
+                                    <span class="stat-value">23 Students</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="students-fee-table card">
+                    <div class="card__header">
+                        <h3>Student Fee Status</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="table-responsive">
+                            <table id="fee-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Total Fee</th>
+                                        <th>Paid</th>
+                                        <th>Pending</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Fee data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hostel Management -->
+            <div id="hostel-management" class="content-section">
+                <div class="section-header">
+                    <h1>Hostel Management</h1>
+                    <button class="btn btn--primary" id="allocate-room-btn">
+                        <i class="fas fa-bed"></i> Allocate Room
+                    </button>
+                </div>
+
+                <div class="hostel-grid">
+                    <div class="room-occupancy card">
+                        <div class="card__header">
+                            <h3>Room Occupancy Overview</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 250px;">
+                                <canvas id="room-occupancy-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hostel-stats card">
+                        <div class="card__header">
+                            <h3>Hostel Statistics</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="hostel-metrics">
+                                <div class="metric-item">
+                                    <i class="fas fa-building"></i>
+                                    <div>
+                                        <span class="metric-label">Total Rooms</span>
+                                        <span class="metric-number" id="total-rooms">500</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <i class="fas fa-users"></i>
+                                    <div>
+                                        <span class="metric-label">Occupied</span>
+                                        <span class="metric-number" id="occupied-rooms">430</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <i class="fas fa-door-open"></i>
+                                    <div>
+                                        <span class="metric-label">Available</span>
+                                        <span class="metric-number" id="available-rooms">70</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <i class="fas fa-tools"></i>
+                                    <div>
+                                        <span class="metric-label">Maintenance</span>
+                                        <span class="metric-number" id="maintenance-requests">12</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rooms-table card">
+                    <div class="card__header">
+                        <h3>Room Allocation Details</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="table-responsive">
+                            <table id="rooms-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Room No.</th>
+                                        <th>Building</th>
+                                        <th>Floor</th>
+                                        <th>Type</th>
+                                        <th>Occupancy</th>
+                                        <th>Students</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Room data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Dashboard -->
+            <div id="student-dashboard" class="content-section">
+                <div class="dashboard-header">
+                    <h1>Student Dashboard</h1>
+                    <p>Welcome back, <span id="student-name"></span></p>
+                </div>
+
+                <div class="student-overview-grid">
+                    <div class="student-profile card">
+                        <div class="card__header">
+                            <h3>My Profile</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="profile-info" id="student-profile">
+                                <!-- Profile info will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fee-status-card card">
+                        <div class="card__header">
+                            <h3>Fee Status</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="fee-overview" id="student-fee-status">
+                                <!-- Fee status will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="student-details-grid">
+                    <div class="hostel-info card">
+                        <div class="card__header">
+                            <h3>Hostel Information</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="hostel-details" id="student-hostel-info">
+                                <!-- Hostel info will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quick-actions card">
+                        <div class="card__header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="action-buttons">
+                                <button class="btn btn--primary btn--full-width" id="pay-fees-btn">
+                                    <i class="fas fa-credit-card"></i> Pay Fees
+                                </button>
+                                <button class="btn btn--outline btn--full-width" id="download-receipt-btn">
+                                    <i class="fas fa-download"></i> Download Receipt
+                                </button>
+                                <button class="btn btn--outline btn--full-width" id="maintenance-request-btn">
+                                    <i class="fas fa-tools"></i> Maintenance Request
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Dashboard -->
+            <div id="analytics-dashboard" class="content-section">
+                <div class="section-header">
+                    <h1>Analytics & Reports</h1>
+                    <button class="btn btn--primary" id="export-report-btn">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="monthly-collection card">
+                        <div class="card__header">
+                            <h3>Monthly Fee Collection Trend</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="monthly-collection-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admission-stats card">
+                        <div class="card__header">
+                            <h3>Admission Statistics</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <h4>Applications Received</h4>
+                                    <span class="stat-number">2,450</span>
+                                </div>
+                                <div class="stat-card">
+                                    <h4>Applications Approved</h4>
+                                    <span class="stat-number">1,250</span>
+                                </div>
+                                <div class="stat-card">
+                                    <h4>Acceptance Rate</h4>
+                                    <span class="stat-number">51%</span>
+                                </div>
+                                <div class="stat-card">
+                                    <h4>Average Merit Score</h4>
+                                    <span class="stat-number">78.5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="payment-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Process Payment</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label class="form-label">Student ID</label>
+                        <input type="text" id="payment-student-id" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input type="number" id="payment-amount" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select id="payment-method" class="form-control" required>
+                            <option value="">Select payment method</option>
+                            <option value="online_banking">Online Banking</option>
+                            <option value="upi">UPI</option>
+                            <option value="credit_card">Credit Card</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--outline" id="cancel-payment">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Process Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="application-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>New Application</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="application-form">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="applicant-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="applicant-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Course</label>
+                        <select id="applicant-course" class="form-control" required>
+                            <option value="">Select course</option>
+                            <option value="B.Tech Computer Science">B.Tech Computer Science</option>
+                            <option value="B.Tech Electronics">B.Tech Electronics</option>
+                            <option value="B.Tech Mechanical">B.Tech Mechanical</option>
+                            <option value="B.Tech Civil">B.Tech Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Merit Score</label>
+                        <input type="number" id="applicant-merit" class="form-control" min="0" max="100" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--outline" id="cancel-application">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
