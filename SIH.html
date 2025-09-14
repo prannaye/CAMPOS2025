@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampOS ERP Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --secondary: #10b981;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+        }
+
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .sidebar-link:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .sidebar-link.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        .card {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07);
+        }
+
+        /* For custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            z-index: 50;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .modal.active,
+        .modal-backdrop.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal.active .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            transition: all 0.3s ease-in-out;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+            z-index: 51;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            transform-origin: top right;
+            animation: scale-in 0.1s ease-out;
+        }
+
+        @keyframes scale-in {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Auth Pages Styling */
+        #auth-container {
+            background-image: url('https://www.transparenttextures.com/patterns/clean-gray-paper.png'), linear-gradient(135deg, #f5f7fa 0%, #e0eafc 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .auth-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .auth-logo {
+            animation: fadeInDown 0.6s ease-in-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.3s;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: #f9fafb;
+            transition: all 0.3s ease-in-out;
+            color: var(--text-primary);
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            background-color: white;
+        }
+
+        .auth-input:focus+.input-icon {
+            color: var(--primary);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(to right, #4f46e5, #6366f1);
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+            border: none;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+</head>
+
+<body class="overflow-hidden">
+    <!-- This container will hold either the auth pages or the main ERP -->
+    <div id="app-root" class="h-screen w-screen"></div>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+
+    <script>
+        // --- MOCK DATA STORE ---
+        let MOCK_DATA = {
+            metrics: {
+                totalStudents: 0, studentGrowth: 12, feeCollection: 0, feeGrowth: 8,
+                hostelOccupancy: 0, availableRooms: 0, pendingTasks: 0, urgentTasks: 0,
+            },
+            recentAdmissions: [
+                { id: 1, name: 'Priya Sharma', course: 'B.Tech CS', status: 'Approved', time: '2 mins ago', initials: 'PS' },
+                { id: 2, name: 'Rahul Verma', course: 'MBA Finance', status: 'Pending', time: '15 mins ago', initials: 'RV' },
+                { id: 3, name: 'Sneha Patel', course: 'M.Sc Physics', status: 'Approved', time: '1 hour ago', initials: 'SP' },
+            ],
+            feeStatus: [
+                { name: 'Semester 1', percentage: 92, amount: '12.4L' },
+                { name: 'Semester 2', percentage: 87, amount: '11.8L' },
+                { name: 'Hostel Fees', percentage: 94, amount: '8.2L' },
+            ],
+            pendingPayments: 2.8,
+            hostelOverview: [
+                { name: 'Boys Hostel', occupancy: '456/500', percentage: 91 },
+                { name: 'Girls Hostel', occupancy: '298/350', percentage: 85 },
+            ],
+            examRecords: [
+                { id: 'ER01', studentId: 'STU24001', studentName: 'Arjun Kumar', examinationId: 'EX01', marksObtained: 92, status: 'Published' },
+                { id: 'ER02', studentId: 'STU23002', studentName: 'Priya Sharma', examinationId: 'EX02', marksObtained: 85, status: 'Published' },
+                { id: 'ER03', studentId: 'STU24001', studentName: 'Arjun Kumar', examinationId: 'EX03', marksObtained: 45, status: 'Published' },
+            ],
+            admissions: [
+                { id: 'APP2024001', name: 'Priya Sharma', email: 'priya.s@example.com', course: 'B.Tech CS', dob: '2004-05-15', date: '2025-09-08', status: 'Approved' },
+                { id: 'APP2024002', name: 'Rahul Verma', email: 'rahul.v@example.com', course: 'MBA Finance', dob: '2002-11-20', date: '2025-09-07', status: 'Pending' },
+            ],
+            students: [
+                { id: 'STU24001', name: 'Arjun Kumar', email: 'arjun.k@example.com', course: 'B.Tech CSE', semester: 1, status: 'Active', dob: '2005-08-22' },
+                { id: 'STU23002', name: 'Priya Sharma', email: 'priya.s@example.com', course: 'B.Tech CS', semester: 3, status: 'Active', dob: '2004-05-15' },
+            ],
+            users: [
+                { id: 1, username: 'admin', password: 'password123', role: 'Admin', name: 'Admin User', email: 'admin@example.com', status: 'Active', created: '2025-01-01', studentId: null },
+                { id: 2, username: 'staff', password: 'password123', role: 'Staff', name: 'Staff Member', email: 'staff@example.com', status: 'Active', created: '2025-02-15', studentId: null },
+            ],
+            attendance: [
+                { id: 'ATT01', studentId: 'STU24001', subject: 'Data Structures', semester: 1, total: 30, attended: 28 },
+                { id: 'ATT02', studentId: 'STU24001', subject: 'Algorithms', semester: 1, total: 30, attended: 22 },
+                { id: 'ATT03', studentId: 'STU23002', subject: 'Financial Management', semester: 3, total: 40, attended: 35 },
+            ],
+            feePayments: [
+                { id: 'FP001', studentId: 'STU24001', amount: '50000', mode: 'Online', date: '2025-09-01', status: 'Completed', receipt: 'RCP001' },
+                { id: 'FP002', studentId: 'STU23002', amount: '75000', mode: 'Card', date: '2025-08-28', status: 'Completed', receipt: 'RCP002' },
+                { id: 'FP003', studentId: 'STU24003', amount: '50000', mode: 'Cheque', date: '2025-09-05', status: 'Pending', receipt: 'RCP003' },
+            ],
+            financialSummary: { totalRevenue: 12450000, monthlyGrowth: 8.5, totalStudents: 1250, avgFeePerStudent: 9960, collectionRate: 92.5, pendingAmount: 934500 },
+            monthlyData: [{ month: "Jan", revenue: 10.5 }, { month: "Feb", revenue: 11.2 }, { month: "Mar", revenue: 12.0 }, { month: "Apr", revenue: 11.8 }, { month: "May", revenue: 12.5 }, { month: "Jun", revenue: 13.2 },],
+            feeBreakdown: [
+                { category: "Tuition Fees", percentage: 68, color: 'var(--primary)' }, { category: "Hostel Fees", percentage: 17, color: 'var(--secondary)' },
+                { category: "Lab & Exam Fees", percentage: 8, color: 'var(--accent)' }, { category: "Other Fees", percentage: 7, color: '#6B7280' },
+            ],
+            hostels: [
+                { id: 'H01', name: 'Vivekananda Boys Hostel', type: 'Boys', totalRooms: 200, occupiedRooms: 180 },
+                { id: 'H02', name: 'Sarojini Girls Hostel', type: 'Girls', totalRooms: 150, occupiedRooms: 145 },
+            ],
+            hostelRooms: [
+                { id: 'R101', number: 'A-101', hostel: 'Vivekananda', status: 'Occupied', capacity: 3, occupiedBeds: 3 },
+                { id: 'R102', number: 'A-102', hostel: 'Vivekananda', status: 'Available', capacity: 3, occupiedBeds: 2 },
+                { id: 'R201', number: 'B-201', hostel: 'Sarojini', status: 'Maintenance', capacity: 2, occupiedBeds: 0 },
+            ],
+            hostelAllocations: [
+                { id: 'A001', studentId: 'STU24001', studentName: 'Arjun Kumar', room: 'A-101', checkInDate: '2025-07-20', checkOutDate: null, status: 'Checked-In' },
+                { id: 'A002', studentId: 'STU23002', studentName: 'Priya Sharma', room: 'B-205', checkInDate: '2025-07-22', checkOutDate: null, status: 'Checked-In' },
+            ],
+            examinations: [
+                { id: 'EX01', name: 'Mid-Semester Examination', date: '2025-10-15', status: 'Scheduled', course: 'B.Tech CSE', semester: 1, subject: 'Data Structures', maxMarks: 100, duration: 120 },
+                { id: 'EX02', name: 'End-Semester Examination', date: '2025-12-10', status: 'Scheduled', course: 'B.Tech CS', semester: 3, subject: 'Financial Management', maxMarks: 100, duration: 180 },
+                { id: 'EX03', name: 'End-Semester Examination', date: '2025-12-15', status: 'Scheduled', course: 'B.Tech CSE', semester: 1, subject: 'Algorithms', maxMarks: 100, duration: 180 },
+            ],
+            libraryStats: { total: 15420, borrowed: 2834, overdue: 127 },
+            borrowedBooks: [
+                { id: 'B001', title: 'Data Structures and Algorithms', studentName: 'Arjun Kumar', studentId: 'STU24001', dueDate: '2025-09-15', status: 'Borrowed' },
+                { id: 'B002', title: 'Intro to Machine Learning', studentName: 'Priya Sharma', studentId: 'STU23002', dueDate: '2025-09-12', status: 'Overdue' },
+            ],
+            notifications: []
+        };
+
+        // --- Data Persistence ---
+        function getInitialData() {
+            const savedData = localStorage.getItem('campOSData');
+            if (savedData) {
+                return JSON.parse(savedData);
+            }
+            // First time load: save initial data and return it
+            localStorage.setItem('campOSData', JSON.stringify(MOCK_DATA));
+            return MOCK_DATA;
+        }
+
+        function saveData() {
+            localStorage.setItem('campOSData', JSON.stringify(MOCK_DATA));
+        }
+
+        // --- APP STATE, ROUTER & AUTH ---
+        MOCK_DATA = getInitialData();
+        const appRoot = document.getElementById('app-root');
+        let mainContent, breadcrumb, sidebarNav;
+        const modalContainer = document.getElementById('modal-container');
+        let examFilters = { examName: 'all', resultStatus: 'all' };
+        let currentUser = null;
+
+        const allNavigations = {
+            Admin: [
+                { name: 'Dashboard', href: '#/', icon: 'layout-dashboard' },
+                { name: 'Student Management', type: 'header' },
+                { name: 'Admissions', href: '#/admissions', icon: 'user-plus' },
+                { name: 'Student Records', href: '#/students', icon: 'users' },
+                { name: 'Attendance', href: '#/attendance', icon: 'check-square' },
+                { name: 'Financial', type: 'header' },
+                { name: 'Fee Collection', href: '#/fee-collection', icon: 'credit-card' },
+                { name: 'Financial Reports', href: '#/financial-reports', icon: 'bar-chart-3' },
+                { name: 'Operations', type: 'header' },
+                { name: 'Hostel Management', href: '#/hostel-management', icon: 'building' },
+                { name: 'Examinations', href: '#/examinations', icon: 'clipboard-list' },
+                { name: 'Library', href: '#/library', icon: 'book' },
+                { name: 'Administration', type: 'header' },
+                { name: 'Settings', href: '#/settings', icon: 'settings' },
+                { name: 'User Management', href: '#/user-management', icon: 'shield' },
+            ],
+            Staff: [
+                { name: 'Dashboard', href: '#/', icon: 'layout-dashboard' },
+                { name: 'Student Management', type: 'header' },
+                { name: 'Student Records', href: '#/students', icon: 'users' },
+                { name: 'Attendance', href: '#/attendance', icon: 'check-square' },
+                { name: 'Operations', type: 'header' },
+                { name: 'Hostel Management', href: '#/hostel-management', icon: 'building' },
+                { name: 'Examinations', href: '#/examinations', icon: 'clipboard-list' },
+                { name: 'Library', href: '#/library', icon: 'book' },
+            ],
+            Student: [
+                { name: 'Dashboard', href: '#/', icon: 'layout-dashboard' },
+                { name: 'Academics', type: 'header' },
+                { name: 'My Results', href: '#/my-results', icon: 'award' },
+                { name: 'My Attendance', href: '#/my-attendance', icon: 'user-check' },
+                { name: 'Report Card', href: '#/report-card', icon: 'file-text' },
+                { name: 'Financials', type: 'header' },
+                { name: 'Fee Status', href: '#/fee-status', icon: 'credit-card' },
+                { name: 'Profile', type: 'header' },
+                { name: 'My Profile', href: '#/my-profile', icon: 'user' },
+            ]
+        }
+
+        const allRoutes = {
+            Admin: {
+                '/': { title: 'Dashboard', render: renderDashboard },
+                '/admissions': { title: 'Admissions', render: renderAdmissions },
+                '/students': { title: 'Student Records', render: renderStudents },
+                '/attendance': { title: 'Attendance Management', render: renderAttendanceManagement },
+                '/fee-collection': { title: 'Fee Collection', render: renderFeeCollection },
+                '/financial-reports': { title: 'Financial Reports', render: renderFinancialReports },
+                '/hostel-management': { title: 'Hostel Management', render: renderHostelManagement },
+                '/examinations': { title: 'Examinations', render: renderExaminations },
+                '/library': { title: 'Library', render: renderLibrary },
+                '/settings': { title: 'Settings', render: renderSettings },
+                '/user-management': { title: 'User Management', render: renderUserManagement },
+            },
+            Staff: {
+                '/': { title: 'Dashboard', render: renderDashboard },
+                '/students': { title: 'Student Records', render: renderStudents },
+                '/attendance': { title: 'Attendance Management', render: renderAttendanceManagement },
+                '/hostel-management': { title: 'Hostel Management', render: renderHostelManagement },
+                '/examinations': { title: 'Examinations', render: renderExaminations },
+                '/library': { title: 'Library', render: renderLibrary },
+            },
+            Student: {
+                '/': { title: 'Dashboard', render: renderStudentDashboard },
+                '/my-results': { title: 'My Results', render: renderStudentResults },
+                '/my-attendance': { title: 'My Attendance', render: renderStudentAttendance },
+                '/report-card': { title: 'Report Card', render: renderStudentReportCard },
+                '/fee-status': { title: 'Fee Status', render: renderStudentFeeStatus },
+                '/my-profile': { title: 'My Profile', render: renderStudentProfile },
+            }
+        };
+
+        function router() {
+            if (!currentUser) {
+                renderLoginPage();
+                return;
+            }
+
+            const routes = allRoutes[currentUser.role];
+            const path = window.location.hash.slice(1) || '/';
+            const route = routes[path] || { title: 'Not Found', render: () => `<div class="text-center p-16"><h1 class="text-3xl font-bold">404 - Page Not Found</h1></div>` };
+
+            mainContent.innerHTML = route.render();
+            breadcrumb.innerHTML = `<span class="font-semibold text-xl text-[var(--text)]">${route.title}</span>`;
+            updateActiveLink(path);
+            lucide.createIcons();
+        }
+
+        function refreshCurrentPage() {
+            router(); // Rerouting will effectively refresh the content
+        }
+
+        // --- MODAL & UTILITY FUNCTIONS ---
+        function openModal(modalId, data = {}) {
+            let modalContent = '';
+            if (modalId === 'add-user-modal') modalContent = getAddUserModalHtml();
+            else if (modalId === 'collect-fee-modal') modalContent = getCollectFeeModalHtml(data.paymentId);
+            else if (modalId === 'add-pending-fee-modal') modalContent = getAddPendingFeeModalHtml();
+            else if (modalId === 'new-admission-modal') modalContent = getNewAdmissionModalHtml();
+            else if (modalId === 'allocate-room-modal') modalContent = getAllocateRoomModalHtml();
+            else if (modalId === 'issue-book-modal') modalContent = getIssueBookModalHtml();
+            else if (modalId === 'manage-room-modal') modalContent = getManageRoomModalHtml(data.roomId);
+            else if (modalId === 'edit-student-modal') modalContent = getEditStudentModalHtml(data.studentId);
+            else if (modalId === 'fee-receipt-modal') modalContent = getFeeReceiptModalHtml(data.paymentId);
+            else if (modalId === 'add-schedule-modal') modalContent = getAddScheduleModalHtml(data.examId);
+            else if (modalId === 'add-result-modal') modalContent = getAddResultModalHtml(data.resultId);
+            else if (modalId === 'marksheet-modal') modalContent = getMarksheetModalHtml(data.resultId);
+            else if (modalId === 'analysis-modal') modalContent = getAnalysisModalHtml(data.examId);
+            else if (modalId === 'add-attendance-modal') modalContent = getAddAttendanceModalHtml(data.attendanceId);
+            else {
+                console.error(`Modal with id ${modalId} not found.`);
+                return;
+            }
+
+            modalContainer.innerHTML = createModal(modalId, modalContent);
+            document.getElementById(modalId)?.classList.add('active');
+            document.getElementById('modal-backdrop')?.classList.add('active');
+            lucide.createIcons();
+
+            document.querySelectorAll(`#${modalId} .modal-close-btn`).forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            document.getElementById('modal-backdrop')?.addEventListener('click', closeModal, { once: true });
+
+            if (modalId === 'fee-receipt-modal' || modalId === 'marksheet-modal' || modalId === 'report-card-modal') {
+                document.getElementById('print-btn')?.addEventListener('click', () => window.print());
+            }
+
+            const formId = modalId.replace('-modal', '-form');
+            const form = document.getElementById(formId);
+            if (form) {
+                const formHandlers = {
+                    'new-admission-form': handleNewAdmissionSubmit,
+                    'collect-fee-form': handleCollectFeeSubmit,
+                    'add-pending-fee-form': handleAddPendingFeeSubmit,
+                    'allocate-room-form': handleAllocateRoomSubmit,
+                    'issue-book-form': handleIssueBookSubmit,
+                    'add-user-form': handleAddUserSubmit,
+                    'manage-room-form': handleManageRoomSubmit,
+                    'edit-student-form': handleEditStudentSubmit,
+                    'add-schedule-form': handleAddScheduleSubmit,
+                    'add-result-form': handleAddResultSubmit,
+                    'add-attendance-form': handleAddAttendanceSubmit,
+                };
+                const handler = formHandlers[formId];
+                if (handler) {
+                    form.addEventListener('submit', handler);
+                }
+            }
+        }
+
+        function openConfirmationModal(title, message, confirmText, onConfirm) {
+            const modalId = 'confirmation-modal';
+            const modalContent = `
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
+                    <div class="p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-red-100">
+                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold">${title}</h3>
+                                <p class="text-sm text-gray-500 mt-1">${message}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
+                        <button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 text-sm font-medium rounded-md hover:bg-gray-300">Cancel</button>
+                        <button id="confirm-action-btn" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700">${confirmText}</button>
+                    </div>
+                </div>`;
+
+            modalContainer.innerHTML = createModal(modalId, modalContent);
+            document.getElementById(modalId)?.classList.add('active');
+            document.getElementById('modal-backdrop')?.classList.add('active');
+            lucide.createIcons();
+
+            const confirmBtn = document.getElementById('confirm-action-btn');
+
+            confirmBtn.addEventListener('click', () => {
+                onConfirm();
+                closeModal();
+            }, { once: true });
+
+            document.querySelectorAll(`#${modalId} .modal-close-btn`).forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            document.getElementById('modal-backdrop')?.addEventListener('click', closeModal, { once: true });
+        }
+
+        function closeModal() {
+            document.querySelector('.modal.active')?.classList.remove('active');
+            document.getElementById('modal-backdrop')?.classList.remove('active');
+            setTimeout(() => {
+                modalContainer.innerHTML = '';
+            }, 300);
+        }
+
+        function createModal(id, content) {
+            return `<div id="${id}" class="modal"><div class="modal-content">${content}</div></div>`;
+        }
+
+        function renderTable(headers, data, rowRenderer) {
+            const canEdit = currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Staff');
+            const editHeaders = canEdit ? headers : headers.filter(h => h !== 'Actions');
+
+            return `
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                 <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>${editHeaders.map(h => `<th class="px-6 py-4 text-left font-semibold text-gray-600 uppercase tracking-wider">${h}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${data.length > 0 ? data.map(item => `<tr class="hover:bg-gray-50 transition-colors duration-200">${rowRenderer(item, canEdit)}</tr>`).join('') : `<tr><td colspan="${editHeaders.length}" class="text-center py-16 text-gray-500"><div class="flex flex-col items-center"><i data-lucide="inbox" class="w-12 h-12 text-gray-300"></i><p class="mt-2">No data available.</p></div></td></tr>`}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function calculateGrade(marks, maxMarks) {
+            if (maxMarks === 0) return 'N/A';
+            const percentage = (marks / maxMarks) * 100;
+            if (percentage >= 90) return 'A+';
+            if (percentage >= 80) return 'A';
+            if (percentage >= 70) return 'B+';
+            if (percentage >= 60) return 'B';
+            if (percentage >= 50) return 'C+';
+            if (percentage >= 40) return 'C';
+            if (percentage >= 30) return 'D';
+            return 'F';
+        }
+
+        function calculateResultStatus(marks, maxMarks) {
+            if (maxMarks === 0) return 'N/A';
+            const percentage = (marks / maxMarks) * 100;
+            return percentage >= 50 ? 'Pass' : 'Fail';
+        }
+
+
+        // --- MAIN ERP RENDERING FUNCTIONS ---
+        function renderSidebar() {
+            const navigation = allNavigations[currentUser.role];
+            sidebarNav.innerHTML = navigation.map(item => {
+                if (item.type === 'header') return `<div class="pt-4 pb-2 px-4"><p class="text-xs font-bold text-gray-400 uppercase tracking-wider">${item.name}</p></div>`;
+                return `<a href="${item.href}" data-path="${item.href.slice(1)}" class="sidebar-link flex items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-600 font-medium"><i data-lucide="${item.icon}" class="w-5 h-5"></i><span>${item.name}</span></a>`;
+            }).join('');
+        }
+
+        // Admin & Staff Dashboard
+        function renderDashboard() {
+            MOCK_DATA.metrics.totalStudents = MOCK_DATA.students.filter(s => s.status === 'Active').length;
+            MOCK_DATA.metrics.pendingTasks = MOCK_DATA.notifications.length;
+            MOCK_DATA.metrics.urgentTasks = MOCK_DATA.notifications.filter(n => n.isUrgent).length;
+            updateFinancialMetrics();
+            updateHostelMetrics();
+            const { metrics } = MOCK_DATA;
+            const metricCards = [
+                { title: 'Total Students', value: metrics.totalStudents, change: `+${metrics.studentGrowth}%`, icon: 'users', color: 'blue' },
+                { title: 'Fee Collection', value: `₹${metrics.feeCollection}L`, change: `+${metrics.feeGrowth}%`, icon: 'indian-rupee', color: 'green' },
+                { title: 'Hostel Occupancy', value: `${metrics.hostelOccupancy}%`, change: `${metrics.availableRooms} free`, icon: 'building', color: 'amber' },
+                { title: 'Pending Tasks', value: metrics.pendingTasks, change: `${metrics.urgentTasks} urgent`, icon: 'list-todo', color: 'red' },
+            ];
+            return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">${metricCards.map(c => renderMetricCard(c)).join('')}</div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"><div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">${renderRecentAdmissionsCard()}${renderFeeStatusCard()}</div><div class="lg:col-span-1">${renderHostelOverviewCard()}</div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="lg:col-span-2">${renderExamRecordsCard()}</div><div class="lg:col-span-1">${renderBroadcastCard()}</div></div>`;
+        }
+
+        function renderMetricCard({ title, value, change, icon, color }) {
+            let changeHtml = `<p class="text-xs text-gray-500">${change}</p>`;
+            if (title === 'Pending Tasks') {
+                const urgentCount = change.split(' ')[0];
+                if (urgentCount > 0) {
+                    changeHtml = `<div class="inline-flex items-center text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700">${change}</div>`;
+                } else {
+                    changeHtml = `<p class="text-xs text-gray-500">0 urgent</p>`;
+                }
+            }
+            return `<div class="card bg-white p-6 rounded-xl border border-gray-200"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">${title}</p><p class="text-3xl font-bold text-gray-800">${value}</p><div class="mt-1">${changeHtml}</div></div><div class="w-12 h-12 rounded-full flex items-center justify-center bg-${color}-100"><i data-lucide="${icon}" class="text-${color}-600"></i></div></div></div>`
+        }
+
+        function renderRecentAdmissionsCard() { return `<div class="card bg-white p-6 rounded-xl border border-gray-200"><h3 class="text-lg font-semibold mb-4">Recent Admissions</h3><div class="space-y-4">${MOCK_DATA.recentAdmissions.map(a => `<div class="flex items-center space-x-4"><div class="w-10 h-10 bg-gray-100 rounded-full flex-shrink-0 flex items-center justify-center"><span class="text-gray-600 font-medium">${a.initials}</span></div><div class="flex-1"><p class="font-semibold text-sm">${a.name}</p><p class="text-xs text-gray-500">${a.course}</p></div><div class="text-right"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${a.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${a.status}</span><p class="text-xs text-gray-400 mt-1">${a.time}</p></div></div>`).join('')}</div></div>`; }
+        function renderFeeStatusCard() { return `<div class="card bg-white p-6 rounded-xl border border-gray-200"><h3 class="text-lg font-semibold mb-4">Fee Collection Status</h3><div class="space-y-4">${MOCK_DATA.feeStatus.map(f => `<div><div class="flex justify-between items-center text-sm mb-1"><span class="font-medium text-gray-600">${f.name}</span><span class="text-gray-500">${f.percentage}%</span></div><div class="bg-gray-200 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full" style="width: ${f.percentage}%"></div></div></div>`).join('')}</div><div class="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center"><span class="font-medium">Pending</span><span class="text-red-600 font-semibold">₹${MOCK_DATA.pendingPayments}L</span></div></div>`; }
+
+        function renderHostelOverviewCard() {
+            const hostelData = MOCK_DATA.hostels.map(hostel => {
+                const roomsInHostel = MOCK_DATA.hostelRooms.filter(r => r.hostel.startsWith(hostel.name.split(' ')[0]));
+                const totalRooms = roomsInHostel.length;
+                const occupiedRooms = roomsInHostel.filter(r => r.status === 'Occupied').length;
+                const percentage = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0;
+                return { name: hostel.name, occupancy: `${occupiedRooms}/${totalRooms}`, percentage: percentage };
+            });
+
+            return `<div class="card bg-white p-6 rounded-xl border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4">Hostel Overview</h3>
+                <div class="space-y-4">
+                    ${hostelData.map(h => `<div>
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span class="font-medium text-gray-600">${h.name}</span>
+                            <span class="text-gray-500">${h.occupancy}</span>
+                        </div>
+                        <div class="bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: ${h.percentage}%"></div>
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        }
+
+        function renderExamRecordsCard() {
+            const recentResults = MOCK_DATA.examRecords.slice(0, 5).map(r => {
+                const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                const student = MOCK_DATA.students.find(s => s.id === r.studentId);
+                const grade = exam ? calculateGrade(r.marksObtained, exam.maxMarks) : 'N/A';
+                return {
+                    ...r, studentName: student ? student.name : 'Unknown', course: exam ? exam.course : 'N/A', subject: exam ? exam.subject : 'N/A', grade: grade
+                };
+            });
+
+            return `<div class="card bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <h3 class="text-lg font-semibold p-6">Recent Exam Results</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold text-gray-600 uppercase tracking-wider">Student</th>
+                            <th class="px-6 py-4 text-left font-semibold text-gray-600 uppercase tracking-wider">Subject</th>
+                            <th class="px-6 py-4 text-left font-semibold text-gray-600 uppercase tracking-wider">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${recentResults.map(r => `<tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap"><div class="font-semibold">${r.studentName}</div><div class="text-gray-500 text-xs">${r.course}</div></td>
+                            <td class="px-6 py-4">${r.subject}</td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${r.grade}</span></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+        }
+
+        function renderBroadcastCard() {
+            const studentsOptions = MOCK_DATA.students
+                .filter(s => s.status === 'Active')
+                .map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`)
+                .join('');
+
+            return `
+            <div class="card bg-white p-6 rounded-xl border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4">Broadcast a Message</h3>
+                <form id="broadcast-form" class="space-y-4">
+                    <div>
+                        <label for="notification-target" class="text-sm font-medium text-gray-700">Recipient</label>
+                        <select id="notification-target" class="mt-1 block w-full border-gray-300 rounded-lg p-2.5 border bg-gray-50 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="all">Broadcast to All</option>
+                            ${studentsOptions}
+                        </select>
+                    </div>
+                    <textarea id="broadcast-message" placeholder="Type a topic or full message..." class="w-full border-gray-300 rounded-lg p-2.5 border bg-gray-50 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required rows="3"></textarea>
+                    <div class="flex items-center justify-start">
+                        <label for="urgent-toggle" class="flex items-center cursor-pointer">
+                            <div class="relative">
+                                <input type="checkbox" id="urgent-toggle" class="sr-only peer">
+                                <div class="block bg-gray-200 w-12 h-6 rounded-full peer-checked:bg-red-300"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform transform peer-checked:translate-x-full peer-checked:bg-red-500"></div>
+                            </div>
+                            <div class="ml-3 text-sm font-medium text-gray-700">Mark as Urgent</div>
+                        </label>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button type="button" id="suggest-message-btn" class="w-full bg-indigo-500 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-600 flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>✨ Suggest</span>
+                        </button>
+                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Send</span>
+                        </button>
+                    </div>
+                </form>
+            </div>`;
+        }
+
+        function renderAdmissions() {
+            return `<div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Admission Applications</h2>
+                <button data-modal-target="new-admission-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                    <i data-lucide="plus" class="w-5 h-5"></i><span>New Application</span>
+                </button>
+            </div>
+            ${renderTable(['App ID', 'Student', 'Course', 'Date', 'Status', 'Actions'], MOCK_DATA.admissions, (a, canEdit) => {
+                let actionsHtml = '';
+                if (canEdit && a.status === 'Pending') {
+                    actionsHtml = `<div class="flex space-x-2">
+                        <button data-admission-id="${a.id}" class="approve-btn p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200"><i data-lucide="check" class="w-4 h-4"></i></button>
+                        <button data-admission-id="${a.id}" class="decline-btn p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>`;
+                } else {
+                    actionsHtml = `<span class="text-xs text-gray-500">Processed</span>`;
+                }
+                let row = `<td class="px-6 py-4 font-mono text-xs">${a.id}</td><td class="px-6 py-4"><div class="font-medium">${a.name}</div><div class="text-xs text-gray-500">${a.email}</div></td><td class="px-6 py-4">${a.course}</td><td class="px-6 py-4">${a.date}</td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${a.status === 'Approved' ? 'bg-green-100 text-green-800' : a.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${a.status}</span></td>`;
+                if (canEdit) row += `<td class="px-6 py-4 text-left">${actionsHtml}</td>`;
+                return row;
+            })}
+        </div>`;
+        }
+
+        function renderStudents() {
+            return `<div class="space-y-6">
+            <h2 class="text-2xl font-bold">Student Records</h2>
+            ${renderTable(['Student ID', 'Name', 'Course', 'Semester', 'DOB', 'Status', 'Actions'], MOCK_DATA.students, (s, canEdit) => {
+                let actionsHtml = `<div class="flex items-center space-x-2">
+                    <button data-modal-target="edit-student-modal" data-student-id="${s.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                    ${s.status === 'Active' ? `<button data-student-id="${s.id}" class="cancel-admission-btn p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+                </div>`;
+                let row = `<td class="px-6 py-4 font-mono text-xs">${s.id}</td><td class="px-6 py-4"><div class="font-medium">${s.name}</div><div class="text-xs text-gray-500">${s.email}</div></td><td class="px-6 py-4">${s.course}</td><td class="px-6 py-4">${s.semester}</td><td class="px-6 py-4">${s.dob}</td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${s.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${s.status}</span></td>`;
+                if (canEdit) row += `<td class="px-6 py-4 text-left">${actionsHtml}</td>`;
+                return row;
+            })}
+        </div>`;
+        }
+        function renderUserManagement() {
+            return `<div class="space-y-6"><div class="flex justify-between items-center"><h2 class="text-2xl font-bold">User Management</h2><button data-modal-target="add-user-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"><i data-lucide="plus" class="w-5 h-5"></i><span>Add User</span></button></div>${renderTable(['Name', 'Email', 'Role', 'Status', 'Created', 'Actions'], MOCK_DATA.users, (u, canEdit) => {
+                let row = `<td class="px-6 py-4">${u.name}</td><td class="px-6 py-4">${u.email}</td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${u.role === 'Admin' ? 'bg-red-100 text-red-800' : u.role === 'Staff' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">${u.role}</span></td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${u.status}</span></td><td class="px-6 py-4">${u.created}</td>`;
+                if (canEdit) row += `<td class="px-6 py-4 text-right space-x-2"><button class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>`;
+                return row;
+            })}</div>`;
+        }
+        function renderFeeCollection() {
+            return `<div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Fee Payments</h2>
+                <div class="flex space-x-2">
+                    <button data-modal-target="add-pending-fee-modal" class="modal-open-btn bg-yellow-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-yellow-600 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i><span>Add Pending Fee</span>
+                    </button>
+                    <button data-modal-target="collect-fee-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                        <i data-lucide="plus" class="w-5 h-5"></i><span>Collect Fee</span>
+                    </button>
+                </div>
+            </div>
+            ${renderTable(
+                ['Receipt ID', 'Student ID', 'Amount', 'Mode', 'Date', 'Status', 'Actions'],
+                MOCK_DATA.feePayments,
+                (p, canEdit) => {
+                    let actionsHtml = '';
+                    if (p.status === 'Completed') {
+                        actionsHtml = `<button data-modal-target="fee-receipt-modal" data-payment-id="${p.id}" class="modal-open-btn text-sm text-blue-600 hover:underline">View Receipt</button>`;
+                    } else if (canEdit && p.status === 'Pending') {
+                        actionsHtml = `<button data-modal-target="collect-fee-modal" data-payment-id="${p.id}" class="modal-open-btn text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200">Collect</button>`;
+                    }
+                    let row = `<td class="px-6 py-4 font-mono text-xs">${p.receipt}</td>
+                            <td class="px-6 py-4">${p.studentId}</td>
+                            <td class="px-6 py-4 font-medium">₹${Number(p.amount).toLocaleString('en-IN')}</td>
+                            <td class="px-6 py-4">${p.mode || 'N/A'}</td>
+                            <td class="px-6 py-4">${p.date}</td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${p.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${p.status}</span></td>`;
+                    if (canEdit) row += `<td class="px-6 py-4 text-left">${actionsHtml}</td>`;
+                    return row;
+                }
+            )}
+        </div>`;
+        }
+        function renderFinancialReports() { const { financialSummary: s, monthlyData: m, feeBreakdown: f } = MOCK_DATA; return `<div class="space-y-6"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">${renderMetricCard({ title: 'Total Revenue', value: `₹${(s.totalRevenue / 10000000).toFixed(1)}Cr`, change: `+${s.monthlyGrowth}% this month`, icon: 'indian-rupee', color: 'green' })}${renderMetricCard({ title: 'Collection Rate', value: `${s.collectionRate}%`, change: 'Above target', icon: 'percent', color: 'green' })}${renderMetricCard({ title: 'Pending Amount', value: `₹${(s.pendingAmount / 100000).toFixed(1)}L`, change: '7.5% of total', icon: 'alert-circle', color: 'red' })}${renderMetricCard({ title: 'Avg. Fee/Student', value: `₹${s.avgFeePerStudent.toLocaleString()}`, change: `from ${s.totalStudents} students`, icon: 'users', color: 'blue' })}</div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="card bg-white p-6 rounded-xl border"><h3 class="font-semibold mb-4">Monthly Revenue (in Lakhs)</h3><div class="h-64 bg-gray-100 rounded-lg flex items-end justify-around p-4">${m.map(d => `<div class="w-8 bg-blue-400 rounded-t-lg" style="height:${(d.revenue / 15) * 100}%" title="${d.month}: ₹${d.revenue}L"></div>`).join('')}</div></div><div class="card bg-white p-6 rounded-xl border"><h3 class="font-semibold mb-4">Fee Breakdown</h3><div class="space-y-4">${f.map(i => `<div><div class="flex justify-between text-sm mb-1"><span>${i.category}</span><span>${i.percentage}%</span></div><div class="bg-gray-200 rounded-full h-2"><div class="h-2 rounded-full" style="width:${i.percentage}%; background-color:${i.color}"></div></div></div>`).join('')}</div></div></div></div>`; }
+        function renderHostelManagement() {
+            const { hostels: h, hostelRooms: r, hostelAllocations: a } = MOCK_DATA;
+            const headers = ['Student Name', 'Student ID', 'Room No.', 'Check-in Date', 'Check-out Date', 'Status', 'Actions'];
+
+            return `<div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Hostel Management</h2>
+                <button id="allocate-room-btn" data-modal-target="allocate-room-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"><i data-lucide="plus" class="w-5 h-5"></i><span>Allocate Room</span></button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">${h.map(hostel => `<div class="card bg-white p-6 rounded-xl border"><h3 class="font-semibold mb-2">${hostel.name} (${hostel.type})</h3><div class="flex justify-between text-sm"><span class="text-gray-500">Occupancy</span><span class="font-medium">${hostel.occupiedRooms}/${hostel.totalRooms}</span></div><div class="bg-gray-200 rounded-full h-2 mt-2"><div class="bg-yellow-500 h-2 rounded-full" style="width:${(hostel.occupiedRooms / hostel.totalRooms) * 100}%"></div></div></div>`).join('')}</div>
+            <div class="card bg-white p-6 rounded-xl border"><h3 class="font-semibold mb-4">Room Status</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">${r.map(room => `<div class="p-4 rounded-lg text-center border ${room.status === 'Available' ? 'bg-green-50 border-green-200' : room.status === 'Occupied' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}"><div class="font-bold text-lg">${room.number}</div><div class="text-xs">${room.status}</div><button data-modal-target="manage-room-modal" data-room-id="${room.id}" class="modal-open-btn text-xs mt-2 text-blue-600 hover:underline">Manage</button></div>`).join('')}</div></div>
+            ${renderTable(headers, a, (alloc, canEdit) => {
+                let actionsHtml = '';
+                if (canEdit && alloc.status === 'Checked-In') {
+                    actionsHtml = `<button data-allocation-id="${alloc.id}" class="checkout-btn text-xs text-yellow-600 hover:text-yellow-800 hover:underline">Check Out</button>`;
+                } else {
+                    actionsHtml = `<span class="text-xs text-gray-400">N/A</span>`
+                }
+                let row = `<td class="px-6 py-4">${alloc.studentName}</td>
+                        <td class="px-6 py-4 font-mono text-xs">${alloc.studentId}</td>
+                        <td class="px-6 py-4">${alloc.room}</td>
+                        <td class="px-6 py-4">${alloc.checkInDate}</td>
+                        <td class="px-6 py-4">${alloc.checkOutDate || '—'}</td>
+                        <td><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${alloc.status === 'Checked-In' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${alloc.status}</span></td>`;
+                if (canEdit) row += `<td class="px-6 py-4">${actionsHtml}</td>`;
+                return row;
+            })}
+        </div>`;
+        }
+        function renderExaminations() {
+            const examNames = ['all', ...new Set(MOCK_DATA.examinations.map(e => e.name))];
+            const canEdit = currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Staff');
+            let filteredRecords = MOCK_DATA.examRecords;
+            if (examFilters.examName !== 'all') {
+                const examId = MOCK_DATA.examinations.find(e => e.name === examFilters.examName)?.id;
+                if (examId) {
+                    filteredRecords = filteredRecords.filter(r => r.examinationId === examId);
+                }
+            }
+            if (examFilters.resultStatus !== 'all') {
+                filteredRecords = filteredRecords.filter(r => {
+                    const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                    if (!exam) return false;
+                    const status = calculateResultStatus(r.marksObtained, exam.maxMarks);
+                    return status.toLowerCase() === examFilters.resultStatus;
+                });
+            }
+
+            return `<div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Examinations</h2>
+                 ${canEdit ? `<div class="flex space-x-2">
+                    <button data-modal-target="add-schedule-modal" class="modal-open-btn bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-600 transition-all duration-200 hover:shadow-lg hover:scale-105"><i data-lucide="calendar-plus" class="w-5 h-5"></i><span>Add Schedule</span></button>
+                    <button data-modal-target="add-result-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105"><i data-lucide="plus" class="w-5 h-5"></i><span>Add Result</span></button>
+                </div>` : ''}
+            </div>
+            <div class="card bg-white p-6 rounded-xl border">
+                <h3 class="font-semibold mb-4">Upcoming Exam Schedule</h3>
+                ${renderTable(['Exam Name', 'Course', 'Subject', 'Date', 'Status', 'Actions'], MOCK_DATA.examinations, (exam, canEdit) => {
+                const actions = `<div class="flex items-center space-x-2">
+                        <button data-exam-id="${exam.id}" class="analyze-results-btn p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200" title="Analyze Results"><i data-lucide="pie-chart" class="w-4 h-4"></i></button>
+                         ${canEdit ? `
+                        <button data-modal-target="add-schedule-modal" data-exam-id="${exam.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <button data-exam-id="${exam.id}" class="delete-schedule-btn p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                         ` : ''}
+                    </div>`;
+                let row = `<td class="px-6 py-4">${exam.name}</td><td>${exam.course}</td><td>${exam.subject}</td><td>${exam.date}</td><td><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">${exam.status}</span></td>`;
+                if (canEdit) row += `<td>${actions}</td>`;
+                return row;
+            })}
+            </div>
+             <div class="card bg-white p-6 rounded-xl border">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold">Examination Results</h3>
+                    <div class="flex items-center space-x-2">
+                        <select id="exam-name-filter" class="text-sm border-gray-300 rounded-lg p-2 border bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            ${examNames.map(name => `<option value="${name}" ${examFilters.examName === name ? 'selected' : ''}>${name === 'all' ? 'All Exams' : name}</option>`).join('')}
+                        </select>
+                        <select id="result-status-filter" class="text-sm border-gray-300 rounded-lg p-2 border bg-gray-50 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="all" ${examFilters.resultStatus === 'all' ? 'selected' : ''}>All Results</option>
+                            <option value="pass" ${examFilters.resultStatus === 'pass' ? 'selected' : ''}>Pass</option>
+                            <option value="fail" ${examFilters.resultStatus === 'fail' ? 'selected' : ''}>Fail</option>
+                        </select>
+                        <button id="clear-filters-btn" class="p-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+                ${renderTable(['Student', 'Exam', 'Marks', 'Grade', 'Result', 'Actions'], filteredRecords, (res, canEdit) => {
+                const exam = MOCK_DATA.examinations.find(e => e.id === res.examinationId);
+                const grade = exam ? calculateGrade(res.marksObtained, exam.maxMarks) : 'N/A';
+                const resultStatus = exam ? calculateResultStatus(res.marksObtained, exam.maxMarks) : 'N/A';
+                const statusClass = resultStatus === 'Pass' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const actions = `<div class="flex items-center space-x-2">
+                        <button data-modal-target="marksheet-modal" data-result-id="${res.id}" class="modal-open-btn p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200" title="View Marksheet"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+                         ${canEdit ? `
+                        <button data-modal-target="add-result-modal" data-result-id="${res.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <button data-result-id="${res.id}" class="delete-result-btn p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                         ` : ''}
+                    </div>`;
+
+                let row = `<td class="px-6 py-4"><div class="font-medium">${res.studentName}</div><div class="text-xs text-gray-500">${res.studentId}</div></td>
+                            <td class="px-6 py-4">${exam ? exam.name : 'N/A'}</td>
+                            <td class="px-6 py-4">${res.marksObtained}/${exam ? exam.maxMarks : 'N/A'}</td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${grade}</span></td>
+                            <td><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${statusClass}">${resultStatus}</span></td>`;
+                if (canEdit) row += `<td>${actions}</td>`;
+                return row;
+            })}
+            </div>
+        </div>`;
+        }
+        function renderLibrary() {
+            const { libraryStats: s, borrowedBooks: b } = MOCK_DATA;
+            const headers = ['Book Title', 'Student', 'Due Date', 'Status', 'Actions'];
+            const canEdit = currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Staff');
+            return `<div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Library</h2>
+                 ${canEdit ? `<button id="issue-book-btn" data-modal-target="issue-book-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                    <i data-lucide="plus" class="w-5 h-5"></i><span>Issue Book</span>
+                </button>` : ''}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                ${renderMetricCard({ title: 'Total Books', value: s.total.toLocaleString(), change: '', icon: 'book-open', color: 'blue' })}
+                ${renderMetricCard({ title: 'Borrowed Books', value: s.borrowed.toLocaleString(), change: '', icon: 'arrow-right-circle', color: 'amber' })}
+                ${renderMetricCard({ title: 'Overdue Books', value: s.overdue, change: '', icon: 'alert-circle', color: 'red' })}
+            </div>
+            ${renderTable(headers, b, (book, canEdit) => {
+                const actionsHtml = `<div class="flex space-x-2">
+                    <button data-book-id="${book.id}" class="return-btn p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200"><i data-lucide="check" class="w-4 h-4"></i></button>
+                    <button data-book-id="${book.id}" class="renew-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                </div>`;
+                let row = `<td class="px-6 py-4">${book.title}</td>
+                        <td class="px-6 py-4"><div class="font-medium">${book.studentName}</div><div class="text-xs text-gray-500">${book.studentId}</div></td>
+                        <td class="px-6 py-4">${book.dueDate}</td>
+                        <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${book.status === 'Overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">${book.status}</span></td>`;
+                if (canEdit) row += `<td class="px-6 py-4">${actionsHtml}</td>`;
+                return row;
+            })}
+        </div>`;
+        }
+        function renderSettings() { return `<div class="max-w-4xl mx-auto space-y-8"><div class="card bg-white p-6 rounded-xl border"><h3 class="text-lg font-semibold mb-4">Profile Settings</h3><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-sm font-medium">Full Name</label><input type="text" value="${currentUser.name}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5"></div><div><label class="text-sm font-medium">Email</label><input type="email" value="${currentUser.email}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5"></div></div><div><label class="text-sm font-medium">Change Password</label><input type="password" placeholder="New Password" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5"></div><button class="bg-blue-600 text-white px-5 py-2.5 rounded-lg">Save Changes</button></div></div><div class="card bg-white p-6 rounded-xl border"><h3 class="text-lg font-semibold mb-4">Notifications</h3><div class="space-y-4"><div class="flex justify-between items-center"><label class="font-medium">Email Notifications</label><button class="w-12 h-6 rounded-full bg-green-500 p-1 flex items-center transition-all duration-300"><span class="w-4 h-4 bg-white rounded-full shadow-md transform translate-x-6"></span></button></div><div class="flex justify-between items-center"><label class="font-medium">SMS Alerts</label><button class="w-12 h-6 rounded-full bg-gray-300 p-1 flex items-center transition-all duration-300"><span class="w-4 h-4 bg-white rounded-full shadow-md transform"></span></button></div></div></div></div>`; }
+        function renderAttendanceManagement() {
+            const canEdit = currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Staff');
+            return `<div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Attendance Records</h2>
+                    <button data-modal-target="add-attendance-modal" class="modal-open-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg hover:scale-105">
+                        <i data-lucide="plus" class="w-5 h-5"></i><span>Add Record</span>
+                    </button>
+                </div>
+                ${renderTable(['Student', 'Subject', 'Semester', 'Attendance', 'Status', 'Actions'], MOCK_DATA.attendance, (att, canEdit) => {
+                const student = MOCK_DATA.students.find(s => s.id === att.studentId);
+                const percentage = att.total > 0 ? Math.round((att.attended / att.total) * 100) : 0;
+                const isDefaulter = percentage < 75;
+                let actionsHtml = `<div class="flex items-center space-x-2">
+                        <button data-modal-target="add-attendance-modal" data-attendance-id="${att.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <button data-attendance-id="${att.id}" class="delete-attendance-btn p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+
+                let row = `<td class="px-6 py-4"><div class="font-medium">${student?.name || att.studentId}</div><div class="text-xs text-gray-500">${att.studentId}</div></td>
+                               <td class="px-6 py-4">${att.subject}</td>
+                               <td class="px-6 py-4">${att.semester}</td>
+                               <td class="px-6 py-4">${percentage}% (${att.attended}/${att.total})</td>
+                               <td class="px-6 py-4">${isDefaulter ? '<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Defaulter</span>' : '<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Regular</span>'}</td>`;
+                if (canEdit) row += `<td class="px-6 py-4">${actionsHtml}</td>`;
+                return row;
+            })}
+            </div>`;
+        }
+
+
+        // --- FORM TEMPLATES (as functions) ---
+        function getAddUserModalHtml() {
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-md"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">Add New User</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="add-user-form" class="space-y-4"><div class="grid grid-cols-2 gap-4"><div><label for="firstName" class="block text-sm font-medium">First Name</label><input type="text" id="firstName" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="lastName" class="block text-sm font-medium">Last Name</label><input type="text" id="lastName" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div></div><div><label for="email" class="block text-sm font-medium">Email</label><input type="email" id="email" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="role" class="block text-sm font-medium">Role</label><select id="role" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white"><option value="Student">Student</option><option value="Staff">Staff</option><option value="Admin">Admin</option></select></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Create User</button></div></form></div></div>`;
+        }
+
+        function getCollectFeeModalHtml(paymentId = null) {
+            let payment = null;
+            let studentId = '';
+            let amount = '';
+            if (paymentId) {
+                payment = MOCK_DATA.feePayments.find(p => p.id === paymentId);
+                if (payment) {
+                    studentId = payment.studentId;
+                    amount = payment.amount;
+                }
+            }
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">${paymentId ? 'Collect Pending Fee' : 'Collect New Fee'}</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="collect-fee-form" class="space-y-4"><input type="hidden" id="paymentId" value="${paymentId || ''}"><div><label for="studentId" class="block text-sm font-medium">Student</label><select id="studentId" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white" ${studentId ? 'disabled' : ''}>${MOCK_DATA.students.map(s => `<option value="${s.id}" ${s.id === studentId ? 'selected' : ''}>${s.id} - ${s.name}</option>`).join('')}</select></div><div><label for="amount" class="block text-sm font-medium">Amount</label><input type="number" id="amount" value="${amount}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border" ${amount ? 'readonly' : ''}></div><div><label for="paymentMode" class="block text-sm font-medium">Payment Mode</label><select id="paymentMode" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white"><option>Online</option><option>Card</option><option>Cash</option><option>Cheque</option></select></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Record Payment</button></div></form></div></div>`;
+        }
+
+        function getAddPendingFeeModalHtml() {
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">Add Pending Fee</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="add-pending-fee-form" class="space-y-4"><div><label for="studentId" class="block text-sm font-medium">Student</label><select id="studentId" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.students.map(s => `<option value="${s.id}">${s.id} - ${s.name}</option>`).join('')}</select></div><div><label for="amount" class="block text-sm font-medium">Amount</label><input type="number" id="amount" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Add Pending</button></div></form></div></div>`;
+        }
+
+        function getNewAdmissionModalHtml() {
+            const courses = ["B.Tech Computer Science", "B.Tech Electronics", "B.Tech Mechanical", "B.Tech Civil", "B.Arch", "B.Pharm", "MBA Finance", "MBA Marketing", "M.Tech Structural Engg.", "M.Sc. Physics", "B.A. English Lit.", "LLB"];
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">New Admission Application</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="new-admission-form" class="space-y-4"><div class="grid grid-cols-2 gap-4"><div><label for="firstName" class="block text-sm font-medium">First Name</label><input type="text" id="firstName" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="lastName" class="block text-sm font-medium">Last Name</label><input type="text" id="lastName" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div></div><div class="grid grid-cols-2 gap-4"><div><label for="email" class="block text-sm font-medium">Email</label><input type="email" id="email" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="dob" class="block text-sm font-medium">Date of Birth</label><input type="date" id="dob" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div></div><div><label for="course" class="block text-sm font-medium">Course</label><select id="course" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${courses.map(c => `<option>${c}</option>`).join('')}</select></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Submit Application</button></div></form></div></div>`;
+        }
+
+        function getEditStudentModalHtml(studentId) {
+            const student = MOCK_DATA.students.find(s => s.id === studentId);
+            if (!student) return `<div>Error: Student not found</div>`;
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Edit Student: ${student.name}</h2>
+                <button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="edit-student-form" class="space-y-4">
+                    <input type="hidden" id="studentId" value="${student.id}">
+                    <div>
+                        <label class="block text-sm font-medium">Student Name</label>
+                        <input type="text" value="${student.name}" disabled class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-md p-2 border">
+                    </div>
+                     <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="semester" class="block text-sm font-medium">Semester</label>
+                            <select id="semester" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">
+                                ${[1, 2, 3, 4, 5, 6, 7, 8].map(sem => `<option value="${sem}" ${student.semester === sem ? 'selected' : ''}>Semester ${sem}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="dob" class="block text-sm font-medium">Date of Birth</label>
+                            <input type="date" id="dob" value="${student.dob}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+        }
+
+        function getFeeReceiptModalHtml(paymentId) {
+            const payment = MOCK_DATA.feePayments.find(p => p.id === paymentId);
+            const student = MOCK_DATA.students.find(s => s.id === payment?.studentId);
+            if (!payment || !student) return `<div>Error: Receipt details not found.</div>`;
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+            <div class="printable-area p-8">
+                 <div class="flex justify-between items-start border-b pb-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[var(--primary)]">CampOS University</h2>
+                        <p class="text-sm text-gray-500">123 University Lane, Knowledge City</p>
+                    </div>
+                    <span class="text-xl font-semibold text-gray-700">Fee Receipt</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm mb-6">
+                    <div><strong class="text-gray-500 block">Receipt No:</strong> ${payment.receipt}</div>
+                    <div><strong class="text-gray-500 block">Payment Date:</strong> ${payment.date}</div>
+                    <div><strong class="text-gray-500 block">Student Name:</strong> ${student.name}</div>
+                    <div><strong class="text-gray-500 block">Student ID:</strong> ${student.id}</div>
+                     <div><strong class="text-gray-500 block">Course:</strong> ${student.course}</div>
+                     <div><strong class="text-gray-500 block">Semester:</strong> ${student.semester}</div>
+                </div>
+                <table class="w-full text-sm mb-6">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="py-2 px-4 text-left font-semibold">Description</th>
+                            <th class="py-2 px-4 text-right font-semibold">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b"><td class="py-2 px-4">Semester Fee</td><td class="py-2 px-4 text-right">₹ ${Number(payment.amount).toLocaleString('en-IN')}</td></tr>
+                    </tbody>
+                    <tfoot class="font-bold">
+                        <tr><td class="py-3 px-4 text-right">Total Paid:</td><td class="py-3 px-4 text-right text-lg">₹ ${Number(payment.amount).toLocaleString('en-IN')}</td></tr>
+                    </tfoot>
+                </table>
+                <div class="text-xs text-gray-500 text-center">This is a computer-generated receipt and does not require a signature.</div>
+            </div>
+            <div class="p-6 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
+                 <button id="print-btn" class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center space-x-2"><i data-lucide="printer" class="w-4 h-4"></i><span>Print</span></button>
+                 <button class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Close</button>
+            </div>
+        </div>`;
+        }
+
+        function getAllocateRoomModalHtml() {
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">Allocate Hostel Room</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="allocate-room-form" class="space-y-4"><div><label for="studentId" class="block text-sm font-medium">Student</label><select id="studentId" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.students.filter(s => !MOCK_DATA.hostelAllocations.find(a => a.studentId === s.id && a.status === 'Checked-In')).map(s => `<option value="${s.id}">${s.id} - ${s.name}</option>`).join('')}</select></div><div><label for="hostel" class="block text-sm font-medium">Hostel</label><select id="hostel" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.hostels.map(h => `<option value="${h.id}">${h.name}</option>`).join('')}</select></div><div><label for="roomNumber" class="block text-sm font-medium">Room Number</label><input type="text" id="roomNumber" required placeholder="e.g., A-102" class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div id="allocation-error" class="text-red-500 text-sm mt-2 hidden"></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Allocate</button></div></form></div></div>`;
+        }
+
+        function getIssueBookModalHtml() {
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">Issue Book</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><div class="p-6"><form id="issue-book-form" class="space-y-4"><div><label for="studentId" class="block text-sm font-medium">Student</label><select id="studentId" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.students.map(s => `<option value="${s.id}">${s.id} - ${s.name}</option>`).join('')}</select></div><div><label for="bookTitle" class="block text-sm font-medium">Book Title</label><input type="text" id="bookTitle" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Issue Book</button></div></form></div></div>`;
+        }
+
+        function getManageRoomModalHtml(roomId) {
+            const room = MOCK_DATA.hostelRooms.find(r => r.id === roomId);
+            if (!room) return '<div>Error: Room not found</div>';
+
+            let optionsHtml = '';
+            if (room.status === 'Occupied') {
+                optionsHtml = `
+                <option value="Occupied" selected>Occupied (current)</option>
+                <option value="Available">Make Available (Vacate)</option>
+                <option value="Maintenance">Set to Maintenance</option>
+            `;
+            } else if (room.status === 'Available') {
+                optionsHtml = `
+                <option value="Available" selected>Available (current)</option>
+                <option value="Maintenance">Set to Maintenance</option>
+            `;
+            } else { // Maintenance
+                optionsHtml = `
+                <option value="Maintenance" selected>Maintenance (current)</option>
+                <option value="Available">Make Available</option>
+            `;
+            }
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-md"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">Manage Room ${room.number}</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><form id="manage-room-form" class="p-6 space-y-4"><input type="hidden" id="manageRoomId" value="${roomId}"><div><label for="newStatus" class="block text-sm font-medium">Change Status</label><select id="newStatus" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${optionsHtml}</select></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">Save Changes</button></div></form></div></div>`;
+        }
+
+        function getAddScheduleModalHtml(examId = null) {
+            const exam = examId ? MOCK_DATA.examinations.find(e => e.id === examId) : null;
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">${exam ? 'Edit Exam Schedule' : 'Add Exam Schedule'}</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><form id="add-schedule-form" class="p-6 space-y-4"><input type="hidden" id="examId" value="${examId || ''}"><div class="grid grid-cols-2 gap-4"><div><label for="examName" class="block text-sm font-medium">Exam Name</label><input type="text" id="examName" value="${exam?.name || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="examDate" class="block text-sm font-medium">Date</label><input type="date" id="examDate" value="${exam?.date || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div></div><div class="grid grid-cols-2 gap-4"><div><label for="examCourse" class="block text-sm font-medium">Course</label><input type="text" id="examCourse" value="${exam?.course || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="examSemester" class="block text-sm font-medium">Semester</label><select id="examSemester" class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${[1, 2, 3, 4, 5, 6, 7, 8].map(s => `<option value="${s}" ${exam?.semester === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div></div><div><label for="examSubject" class="block text-sm font-medium">Subject</label><input type="text" id="examSubject" value="${exam?.subject || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div class="grid grid-cols-2 gap-4"><div><label for="maxMarks" class="block text-sm font-medium">Max Marks</label><input type="number" id="maxMarks" value="${exam?.maxMarks || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div><label for="duration" class="block text-sm font-medium">Duration (mins)</label><input type="number" id="duration" value="${exam?.duration || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">${exam ? 'Save Changes' : 'Add Schedule'}</button></div></form></div></div>`;
+        }
+
+        function getAddResultModalHtml(resultId = null) {
+            const result = resultId ? MOCK_DATA.examRecords.find(r => r.id === resultId) : null;
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg"><div class="p-6 border-b flex justify-between items-center"><h2 class="text-xl font-semibold">${result ? 'Edit Exam Result' : 'Add Exam Result'}</h2><button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button></div><form id="add-result-form" class="p-6 space-y-4"><input type="hidden" id="resultId" value="${resultId || ''}"><div><label for="studentId" class="block text-sm font-medium">Student</label><select id="studentId" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.students.map(s => `<option value="${s.id}" ${result?.studentId === s.id ? 'selected' : ''}>${s.id} - ${s.name}</option>`).join('')}</select></div><div><label for="examinationId" class="block text-sm font-medium">Examination</label><select id="examinationId" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">${MOCK_DATA.examinations.map(e => `<option value="${e.id}" ${result?.examinationId === e.id ? 'selected' : ''}>${e.name} - ${e.subject} (Sem ${e.semester})</option>`).join('')}</select></div><div><label for="marksObtained" class="block text-sm font-medium">Marks Obtained</label><input type="number" id="marksObtained" value="${result?.marksObtained || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border"></div><div id="result-error" class="text-red-500 text-sm mt-2 hidden"></div><div class="flex justify-end space-x-2 pt-4"><button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">${result ? 'Save Changes' : 'Add Result'}</button></div></form></div></div>`;
+        }
+
+        function getMarksheetModalHtml(resultId) {
+            const result = MOCK_DATA.examRecords.find(r => r.id === resultId);
+            const student = MOCK_DATA.students.find(s => s.id === result?.studentId);
+            const exam = MOCK_DATA.examinations.find(e => e.id === result?.examinationId);
+            if (!result || !student || !exam) return `<div>Error: Marksheet details not found.</div>`;
+            const grade = calculateGrade(result.marksObtained, exam.maxMarks);
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div class="printable-area p-8">
+                 <div class="text-center border-b pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-[var(--primary)]">CampOS University</h2>
+                    <p class="text-lg font-semibold text-gray-700">Statement of Marks</p>
+                    <p class="text-sm text-gray-500">${exam.name} - ${exam.date}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mb-6">
+                    <div><strong class="text-gray-500">Student Name:</strong> ${student.name}</div>
+                    <div><strong class="text-gray-500">Student ID:</strong> ${student.id}</div>
+                    <div><strong class="text-gray-500">Course:</strong> ${student.course}</div>
+                    <div><strong class="text-gray-500">Semester:</strong> ${exam.semester}</div>
+                </div>
+                <table class="w-full text-sm mb-6 border">
+                    <thead class="bg-gray-50">
+                        <tr class="border-b"><th class="py-2 px-4 text-left font-semibold">Subject</th><th class="py-2 px-4 text-center font-semibold">Max Marks</th><th class="py-2 px-4 text-center font-semibold">Marks Obtained</th><th class="py-2 px-4 text-center font-semibold">Grade</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b"><td class="py-2 px-4">${exam.subject}</td><td class="py-2 px-4 text-center">${exam.maxMarks}</td><td class="py-2 px-4 text-center">${result.marksObtained}</td><td class="py-2 px-4 text-center">${grade}</td></tr>
+                    </tbody>
+                </table>
+                 <div class="mt-6">
+                    <h4 class="font-semibold text-sm mb-2">Performance Remarks</h4>
+                    <textarea id="performance-remark" class="w-full border-gray-300 rounded-md p-2 border text-sm" rows="3" placeholder="AI-generated remarks will appear here..."></textarea>
+                    <div id="remark-loader" class="text-center p-4 hidden">
+                       <div class="loader text-primary"></div>
+                    </div>
+                     ${(currentUser.role === 'Admin' || currentUser.role === 'Staff') ? `<button data-result-id="${resultId}" class="generate-remark-btn mt-2 w-full bg-indigo-500 text-white px-4 py-2 rounded-md flex items-center justify-center space-x-2 hover:bg-indigo-600">
+                         <i data-lucide="sparkles" class="w-4 h-4"></i>
+                         <span>✨ Generate Remark</span>
+                    </button>` : ''}
+                </div>
+                <div class="flex justify-between items-end mt-8 pt-4 border-t">
+                    <div class="text-xs text-gray-500">Date Issued: ${new Date().toISOString().split('T')[0]}</div>
+                    <div class="text-center">
+                        <div class="w-24 border-b border-gray-400"></div>
+                        <p class="text-xs mt-1">Controller of Examinations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
+                 <button id="print-btn" class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center space-x-2"><i data-lucide="printer" class="w-4 h-4"></i><span>Print</span></button>
+                 <button class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Close</button>
+            </div>
+        </div>`;
+        }
+
+        function getAnalysisModalHtml(examId) {
+            const exam = MOCK_DATA.examinations.find(e => e.id === examId);
+            if (!exam) return `<div>Error: Exam not found.</div>`;
+
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-semibold">✨ Results Analysis</h2>
+                        <p class="text-sm text-gray-500">${exam.name} - ${exam.subject}</p>
+                    </div>
+                    <button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+                </div>
+                <div class="p-6">
+                    <div id="analysis-content" class="text-sm text-gray-700 space-y-4" style="prose">
+                        <div class="flex items-center justify-center h-32">
+                            <div class="loader" style="width: 32px; height: 32px; border-width: 3px; border-color: var(--primary); border-bottom-color: transparent;"></div>
+                        </div>
+                        <p class="text-center text-gray-500">Analyzing results...</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
+                    <button class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Close</button>
+                </div>
+            </div>`;
+        }
+
+        function getAddAttendanceModalHtml(attendanceId = null) {
+            const record = attendanceId ? MOCK_DATA.attendance.find(a => a.id === attendanceId) : null;
+            return `<div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">${record ? 'Edit' : 'Add'} Attendance Record</h2>
+                    <button class="modal-close-btn text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+                </div>
+                <form id="add-attendance-form" class="p-6 space-y-4">
+                    <input type="hidden" id="attendanceId" value="${attendanceId || ''}">
+                    <div>
+                        <label for="studentId" class="block text-sm font-medium">Student</label>
+                        <select id="studentId" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border bg-white">
+                            ${MOCK_DATA.students.filter(s => s.status === 'Active').map(s => `<option value="${s.id}" ${record?.studentId === s.id ? 'selected' : ''}>${s.name} (${s.id})</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                         <div>
+                            <label for="subject" class="block text-sm font-medium">Subject</label>
+                            <input type="text" id="subject" value="${record?.subject || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border">
+                        </div>
+                        <div>
+                            <label for="semester" class="block text-sm font-medium">Semester</label>
+                            <input type="number" id="semester" value="${record?.semester || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border">
+                        </div>
+                    </div>
+                     <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="totalLectures" class="block text-sm font-medium">Total Lectures</label>
+                            <input type="number" id="totalLectures" value="${record?.total || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border">
+                        </div>
+                        <div>
+                            <label for="attendedLectures" class="block text-sm font-medium">Attended Lectures</label>
+                            <input type="number" id="attendedLectures" value="${record?.attended || ''}" required class="mt-1 block w-full border-gray-300 rounded-md p-2 border">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" class="modal-close-btn px-4 py-2 bg-gray-200 rounded-md">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-[var(--primary)] text-white rounded-md">${record ? 'Save Changes' : 'Add Record'}</button>
+                    </div>
+                </form>
+            </div>`;
+        }
+
+        // --- EVENT LISTENERS & INITIALIZATION ---
+        function updateActiveLink(path) {
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                link.classList.add('text-gray-600');
+                if (link.dataset.path === path) {
+                    link.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+                    link.classList.remove('text-gray-600');
+                }
+            });
+        }
+
+        function updateHostelMetrics() {
+            let occupiedCount = 0;
+            let totalCount = 0;
+            MOCK_DATA.hostels.forEach(hostel => {
+                const roomsInHostel = MOCK_DATA.hostelRooms.filter(r => r.hostel === hostel.name.split(' ')[0]);
+                hostel.totalRooms = roomsInHostel.length;
+                hostel.occupiedRooms = roomsInHostel.filter(r => r.status === 'Occupied').length;
+                occupiedCount += hostel.occupiedRooms;
+                totalCount += hostel.totalRooms;
+            });
+            MOCK_DATA.metrics.hostelOccupancy = totalCount > 0 ? Math.round((occupiedCount / totalCount) * 100) : 0;
+            MOCK_DATA.metrics.availableRooms = totalCount - occupiedCount;
+        }
+
+        function updateFinancialMetrics() {
+            const completedPayments = MOCK_DATA.feePayments.filter(p => p.status === 'Completed');
+            const pendingPayments = MOCK_DATA.feePayments.filter(p => p.status === 'Pending');
+
+            const totalCollected = completedPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+            const totalPending = pendingPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+
+            MOCK_DATA.metrics.feeCollection = (totalCollected / 100000).toFixed(1);
+            MOCK_DATA.pendingPayments = (totalPending / 100000).toFixed(1);
+
+            const totalFees = MOCK_DATA.students.length * 100000; // Simplified
+            const percentage = totalFees > 0 ? (totalCollected / totalFees) * 100 : 0;
+            MOCK_DATA.feeStatus[0].percentage = Math.min(100, Math.round(percentage));
+        }
+
+
+        // Form Handlers
+        function handleNewAdmissionSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const newAdmission = { id: `APP${new Date().getFullYear()}${String(MOCK_DATA.admissions.length + 1).padStart(3, '0')}`, name: `${form.firstName.value} ${form.lastName.value}`, email: form.email.value, course: form.course.value, dob: form.dob.value, date: new Date().toISOString().split('T')[0], status: 'Pending' };
+            MOCK_DATA.admissions.unshift(newAdmission);
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleCollectFeeSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const paymentId = form.paymentId.value;
+            const student = MOCK_DATA.students.find(s => s.id === form.studentId.value);
+
+            if (paymentId) { // Updating a pending payment
+                const payment = MOCK_DATA.feePayments.find(p => p.id === paymentId);
+                if (payment) {
+                    payment.status = 'Completed';
+                    payment.paymentMode = form.paymentMode.value;
+                    payment.date = new Date().toISOString().split('T')[0];
+                }
+            } else { // Creating a new payment
+                const newPayment = { id: `FP00${MOCK_DATA.feePayments.length + 1}`, studentId: student.id, amount: form.amount.value, mode: form.paymentMode.value, date: new Date().toISOString().split('T')[0], status: 'Completed', receipt: `RCP00${MOCK_DATA.feePayments.length + 1}` };
+                MOCK_DATA.feePayments.unshift(newPayment);
+            }
+
+            updateFinancialMetrics();
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAddPendingFeeSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const student = MOCK_DATA.students.find(s => s.id === form.studentId.value);
+            if (!student) return;
+
+            const newPayment = {
+                id: `FP00${MOCK_DATA.feePayments.length + 1}`,
+                studentId: student.id,
+                amount: form.amount.value,
+                mode: null,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Pending',
+                receipt: `RCP00${MOCK_DATA.feePayments.length + 1}`
+            };
+            MOCK_DATA.feePayments.unshift(newPayment);
+            updateFinancialMetrics();
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAllocateRoomSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const student = MOCK_DATA.students.find(s => s.id === form.studentId.value);
+            const roomNumber = form.roomNumber.value.trim().toUpperCase();
+            const hostelId = form.hostel.value;
+            const hostelInfo = MOCK_DATA.hostels.find(h => h.id === hostelId);
+            const errorDiv = document.getElementById('allocation-error');
+            errorDiv.classList.add('hidden');
+
+            if (!student || !roomNumber || !hostelInfo) {
+                errorDiv.textContent = 'Please fill all fields correctly.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            let room = MOCK_DATA.hostelRooms.find(r => r.number === roomNumber);
+            if (room) {
+                if (room.status === 'Occupied') {
+                    errorDiv.textContent = `Error: Room ${roomNumber} is already occupied. Please choose another room.`;
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+                if (room.status === 'Maintenance') {
+                    errorDiv.textContent = `Error: Room ${roomNumber} is under maintenance. Please choose another room.`;
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            const newAllocation = { id: `A00${MOCK_DATA.hostelAllocations.length + 1}`, studentId: student.id, studentName: student.name, room: roomNumber, checkInDate: new Date().toISOString().split('T')[0], checkOutDate: null, status: 'Checked-In' };
+            MOCK_DATA.hostelAllocations.unshift(newAllocation);
+
+            if (room) {
+                room.status = 'Occupied';
+            } else {
+                const newRoom = { id: `R${Date.now()}`, number: roomNumber, hostel: hostelInfo.name.split(' ')[0], status: 'Occupied', capacity: 3, occupiedBeds: 1, };
+                MOCK_DATA.hostelRooms.push(newRoom);
+            }
+
+            updateHostelMetrics();
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleIssueBookSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const student = MOCK_DATA.students.find(s => s.id === form.studentId.value);
+            const newIssue = { id: `B00${MOCK_DATA.borrowedBooks.length + 1}`, title: form.bookTitle.value, studentName: student ? student.name : 'Unknown', studentId: student.id, dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], status: 'Borrowed' };
+            MOCK_DATA.borrowedBooks.unshift(newIssue);
+            MOCK_DATA.libraryStats.borrowed++;
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAddUserSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const newUser = { id: MOCK_DATA.users.length + 1, name: `${form.firstName.value} ${form.lastName.value}`, email: form.email.value, role: form.role.value, status: 'Active', created: new Date().toISOString().split('T')[0] };
+            MOCK_DATA.users.unshift(newUser);
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleEditStudentSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const studentId = form.studentId.value;
+            const newSemester = form.semester.value;
+            const newDob = form.dob.value;
+            const student = MOCK_DATA.students.find(s => s.id === studentId);
+            if (student) {
+                student.semester = parseInt(newSemester, 10);
+                student.dob = newDob;
+            }
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleManageRoomSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const roomId = form.manageRoomId.value;
+            const newStatus = form.newStatus.value;
+            const room = MOCK_DATA.hostelRooms.find(r => r.id === roomId);
+            if (!room) return;
+
+            const oldStatus = room.status;
+            if (oldStatus !== newStatus) {
+                room.status = newStatus;
+
+                if (oldStatus === 'Occupied') {
+                    const allocation = MOCK_DATA.hostelAllocations.find(a => a.room === room.number && a.status === 'Checked-In');
+                    if (allocation) {
+                        handleCheckout(allocation.id, false); // Don't refresh page yet
+                    }
+                }
+                if (newStatus === 'Available' || newStatus === 'Maintenance') {
+                    room.occupiedBeds = 0;
+                }
+                updateHostelMetrics();
+            }
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAdmissionAction(admissionId, action) {
+            const admission = MOCK_DATA.admissions.find(a => a.id === admissionId);
+            if (!admission) return;
+
+            if (action === 'approve') {
+                admission.status = 'Approved';
+
+                // Check if student already exists
+                const existingStudent = MOCK_DATA.students.find(s => s.email === admission.email);
+                if (existingStudent) {
+                    existingStudent.status = 'Active';
+                } else {
+                    const newStudentId = `STU${new Date().getFullYear().toString().slice(-2)}${String(MOCK_DATA.students.length + 1).padStart(3, '0')}`;
+                    const newStudent = {
+                        id: newStudentId, name: admission.name, email: admission.email, course: admission.course,
+                        semester: 1, status: 'Active', dob: admission.dob
+                    };
+                    MOCK_DATA.students.unshift(newStudent);
+                }
+
+                const newRecentAdmission = {
+                    id: Date.now(), name: admission.name, course: admission.course, status: 'Approved',
+                    time: 'Just now', initials: (admission.name.split(' ')[0][0] || '') + (admission.name.split(' ')[1]?.[0] || '')
+                };
+                MOCK_DATA.recentAdmissions.unshift(newRecentAdmission);
+                if (MOCK_DATA.recentAdmissions.length > 3) MOCK_DATA.recentAdmissions.pop();
+
+            } else if (action === 'decline') {
+                admission.status = 'Rejected';
+            }
+            saveData();
+            refreshCurrentPage();
+        }
+
+        function handleCancelAdmission(studentId) {
+            openConfirmationModal(
+                'Cancel Admission?',
+                'This will mark the student as inactive and they will be removed from active records. This action cannot be undone.',
+                'Yes, Cancel',
+                () => {
+                    const student = MOCK_DATA.students.find(s => s.id === studentId);
+                    if (student && student.status === 'Active') {
+                        student.status = 'Inactive';
+                    }
+                    saveData();
+                    refreshCurrentPage();
+                }
+            );
+        }
+
+        function handleCheckout(allocationId, shouldRefresh = true) {
+            const allocation = MOCK_DATA.hostelAllocations.find(a => a.id === allocationId);
+            if (!allocation || allocation.status !== 'Checked-In') return;
+
+            allocation.status = 'Checked-Out';
+            allocation.checkOutDate = new Date().toISOString().split('T')[0];
+
+            const room = MOCK_DATA.hostelRooms.find(r => r.number === allocation.room);
+            if (room) {
+                room.status = 'Available';
+                room.occupiedBeds = 0;
+            }
+
+            updateHostelMetrics();
+            saveData();
+            if (shouldRefresh) {
+                refreshCurrentPage();
+            }
+        }
+
+        function handleReturnBook(bookId) {
+            const bookIndex = MOCK_DATA.borrowedBooks.findIndex(b => b.id === bookId);
+            if (bookIndex > -1) {
+                const book = MOCK_DATA.borrowedBooks[bookIndex];
+                if (book.status === 'Overdue') {
+                    MOCK_DATA.libraryStats.overdue--;
+                }
+                MOCK_DATA.borrowedBooks.splice(bookIndex, 1);
+                MOCK_DATA.libraryStats.borrowed--;
+                saveData();
+                refreshCurrentPage();
+            }
+        }
+
+        function handleRenewBook(bookId) {
+            const book = MOCK_DATA.borrowedBooks.find(b => b.id === bookId);
+            if (book) {
+                const currentDate = new Date(book.dueDate);
+                currentDate.setDate(currentDate.getDate() + 15);
+                book.dueDate = currentDate.toISOString().split('T')[0];
+                if (book.status === 'Overdue') {
+                    MOCK_DATA.libraryStats.overdue--;
+                }
+                book.status = 'Borrowed';
+                saveData();
+                refreshCurrentPage();
+            }
+        }
+
+        function renderNotifications() {
+            const panel = document.getElementById('notification-panel');
+            const badge = document.getElementById('notification-badge');
+            if (!panel || !badge) return;
+
+            let visibleNotifications = MOCK_DATA.notifications;
+            if (currentUser.role === 'Student') {
+                visibleNotifications = MOCK_DATA.notifications.filter(n => n.studentId === 'all' || n.studentId === currentUser.studentId);
+            }
+
+            badge.textContent = visibleNotifications.length;
+
+            if (visibleNotifications.length === 0) {
+                panel.innerHTML = '<div class="p-4 text-sm text-gray-500 text-center">No new notifications</div>';
+                return;
+            }
+
+            panel.innerHTML = visibleNotifications.map(n => {
+                let targetInfo = '';
+                if (currentUser.role !== 'Student' && n.studentId !== 'all') {
+                    const student = MOCK_DATA.students.find(s => s.id === n.studentId);
+                    targetInfo = `<p class="text-xs text-blue-500 mt-1">Sent to: ${student ? student.name : n.studentId}</p>`;
+                }
+
+                return `
+                <div class="flex items-start justify-between p-2 hover:bg-gray-100 rounded-md">
+                    <div class="text-sm flex-1">
+                        <p>${n.message}</p>
+                        <div class="flex items-center mt-1">
+                            ${n.isUrgent ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800 mr-2">Urgent</span>` : ''}
+                            <p class="text-xs text-gray-400">${n.time}</p>
+                        </div>
+                        ${targetInfo}
+                    </div>
+                    ${currentUser.role !== 'Student' ? `<button data-notification-id="${n.id}" class="delete-notification-btn text-gray-400 hover:text-red-500 flex-shrink-0 ml-2"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function handleAddNotificationSubmit(e) {
+            e.preventDefault();
+            const targetStudentId = document.getElementById('notification-target').value;
+            const input = document.getElementById('broadcast-message');
+            const isUrgent = document.getElementById('urgent-toggle').checked;
+            if (!input || !input.value) return;
+
+            const newNotification = {
+                id: Date.now(),
+                message: input.value,
+                time: 'Just now',
+                isUrgent: isUrgent,
+                studentId: targetStudentId
+            };
+            MOCK_DATA.notifications.unshift(newNotification);
+            saveData();
+            input.value = '';
+            document.getElementById('urgent-toggle').checked = false; // Reset toggle
+            renderNotifications();
+            if (window.location.hash === '#/' || window.location.hash === '') {
+                refreshCurrentPage();
+            }
+        }
+
+        function handleAddScheduleSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const examId = form.examId.value;
+
+            const scheduleData = {
+                name: form.examName.value, date: form.examDate.value, course: form.examCourse.value,
+                semester: parseInt(form.examSemester.value), subject: form.examSubject.value,
+                maxMarks: parseInt(form.maxMarks.value), duration: parseInt(form.duration.value), status: 'Scheduled'
+            };
+
+            if (examId) {
+                const index = MOCK_DATA.examinations.findIndex(exam => exam.id === examId);
+                MOCK_DATA.examinations[index] = { ...MOCK_DATA.examinations[index], ...scheduleData };
+            } else {
+                scheduleData.id = `EX${Date.now()}`;
+                MOCK_DATA.examinations.unshift(scheduleData);
+            }
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAddResultSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const resultId = form.resultId.value;
+            const student = MOCK_DATA.students.find(s => s.id === form.studentId.value);
+            const errorDiv = document.getElementById('result-error');
+            errorDiv.classList.add('hidden');
+
+            const resultData = {
+                studentId: form.studentId.value,
+                studentName: student.name,
+                examinationId: form.examinationId.value,
+                marksObtained: parseInt(form.marksObtained.value),
+                status: 'Published'
+            };
+
+            const isDuplicate = MOCK_DATA.examRecords.some(rec => rec.studentId === resultData.studentId && rec.examinationId === resultData.examinationId && rec.id !== resultId);
+            if (isDuplicate) {
+                errorDiv.textContent = 'A result for this student in this exam already exists.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (resultId) {
+                const index = MOCK_DATA.examRecords.findIndex(res => res.id === resultId);
+                MOCK_DATA.examRecords[index] = { ...MOCK_DATA.examRecords[index], ...resultData };
+            } else {
+                resultData.id = `ER${Date.now()}`;
+                MOCK_DATA.examRecords.unshift(resultData);
+            }
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleAddAttendanceSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const attendanceId = form.attendanceId.value;
+            const studentId = form.studentId.value;
+            const existingRecord = MOCK_DATA.attendance.find(rec =>
+                rec.studentId === studentId &&
+                rec.subject.toLowerCase() === form.subject.value.trim().toLowerCase() &&
+                rec.id !== attendanceId
+            );
+
+            if (existingRecord) {
+                alert('An attendance record for this student and subject already exists.');
+                return;
+            }
+
+            const recordData = {
+                studentId: studentId,
+                subject: form.subject.value.trim(),
+                semester: parseInt(form.semester.value),
+                total: parseInt(form.totalLectures.value),
+                attended: parseInt(form.attendedLectures.value),
+            };
+
+            if (attendanceId) {
+                const index = MOCK_DATA.attendance.findIndex(rec => rec.id === attendanceId);
+                MOCK_DATA.attendance[index] = { ...MOCK_DATA.attendance[index], ...recordData };
+            } else {
+                recordData.id = `ATT${Date.now()}`;
+                MOCK_DATA.attendance.push(recordData);
+            }
+            saveData();
+            closeModal();
+            refreshCurrentPage();
+        }
+
+        function handleDeleteSchedule(examId) {
+            openConfirmationModal(
+                'Delete Exam Schedule?',
+                'This action will permanently delete the exam schedule and all associated student results. This cannot be undone.',
+                'Delete',
+                () => {
+                    MOCK_DATA.examinations = MOCK_DATA.examinations.filter(e => e.id !== examId);
+                    MOCK_DATA.examRecords = MOCK_DATA.examRecords.filter(r => r.examinationId !== examId);
+                    saveData();
+                    refreshCurrentPage();
+                }
+            );
+        }
+
+        function handleDeleteResult(resultId) {
+            openConfirmationModal(
+                'Delete Result?',
+                'This will permanently delete this student\'s result for the exam. This action cannot be undone.',
+                'Delete',
+                () => {
+                    MOCK_DATA.examRecords = MOCK_DATA.examRecords.filter(r => r.id !== resultId);
+                    saveData();
+                    refreshCurrentPage();
+                }
+            );
+        }
+
+        // --- GEMINI API INTEGRATIONS ---
+
+        async function handleGenerateRemark(resultId) {
+            const button = document.querySelector(`.generate-remark-btn[data-result-id="${resultId}"]`);
+            const loader = document.getElementById('remark-loader');
+            const textarea = document.getElementById('performance-remark');
+
+            if (!button || !loader || !textarea) return;
+
+            button.disabled = true;
+            button.innerHTML = '<div class="loader"></div>';
+
+            const result = MOCK_DATA.examRecords.find(r => r.id === resultId);
+            const student = MOCK_DATA.students.find(s => s.id === result?.studentId);
+            const exam = MOCK_DATA.examinations.find(e => e.id === result?.examinationId);
+
+            if (!result || !student || !exam) {
+                textarea.value = "Error: Could not retrieve student or exam details.";
+                button.disabled = false;
+                button.innerHTML = '✨ Generate Remark';
+                return;
+            }
+
+            const grade = calculateGrade(result.marksObtained, exam.maxMarks);
+
+            const systemPrompt = "You are an academic advisor. Write a concise, one-paragraph performance remark for a student's marksheet. Be encouraging but also constructive if the performance is low. Address the student by their first name.";
+            const userQuery = `Student: ${student.name.split(' ')[0]}, Exam: ${exam.name}, Subject: ${exam.subject}, Marks: ${result.marksObtained} out of ${exam.maxMarks}, Grade: ${grade}. Generate a performance remark.`;
+            const apiKey = ""; // API key will be injected here.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                textarea.value = text || "Could not generate a remark. Please try again.";
+
+            } catch (error) {
+                console.error("Error generating remark:", error);
+                textarea.value = "Failed to generate remark due to a network or API error.";
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i><span>✨ Generate Remark</span>';
+                lucide.createIcons();
+            }
+        }
+
+        async function handleSuggestMessage() {
+            const button = document.getElementById('suggest-message-btn');
+            const textarea = document.getElementById('broadcast-message');
+            const originalText = textarea.value.trim();
+
+            if (!originalText) {
+                textarea.placeholder = "Please enter a topic first!";
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<div class="loader"></div>';
+
+            const systemPrompt = "You are a helpful assistant for a university administrator. Your task is to take a topic or a draft message and expand it into a clear, professional, and complete announcement suitable for students and staff. Ensure the tone is appropriate for a university setting.";
+            const userQuery = `Expand the following topic into a full announcement: "${originalText}"`;
+            const apiKey = ""; // API key will be injected here.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) { throw new Error(`API error: ${response.statusText}`); }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                textarea.value = text || "Could not generate a message. Please try again.";
+
+            } catch (error) {
+                console.error("Error suggesting message:", error);
+                textarea.value = "Failed to generate message due to a network or API error.";
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i><span>✨ Suggest</span>';
+                lucide.createIcons();
+            }
+        }
+
+        async function handleAnalyzeResults(examId) {
+            openModal('analysis-modal', { examId: examId });
+            const analysisContent = document.getElementById('analysis-content');
+            const exam = MOCK_DATA.examinations.find(e => e.id === examId);
+            const results = MOCK_DATA.examRecords.filter(r => r.examinationId === examId);
+
+            if (!exam || results.length === 0) {
+                analysisContent.innerHTML = "<p>No results found for this examination to analyze.</p>";
+                return;
+            }
+
+            const scores = results.map(r => r.marksObtained);
+            const maxMarks = exam.maxMarks;
+
+            const systemPrompt = "You are an expert academic analyst. Your task is to analyze a set of student exam scores and provide a concise, insightful summary. The summary should be well-structured using markdown for headings and bullet points.";
+            const userQuery = `
+                Please analyze the following exam results:
+                - Exam Name: ${exam.name}
+                - Subject: ${exam.subject}
+                - Maximum Marks: ${maxMarks}
+                - Student Scores: [${scores.join(', ')}]
+                
+                Provide an analysis covering:
+                1.  **Overall Performance Summary:** A brief paragraph summarizing the results (e.g., pass rate, average score). Assume a pass mark of 50% of Maximum Marks.
+                2.  **Score Distribution:** A brief comment on how the scores are distributed (e.g., clustered, widespread).
+                3.  **Key Insights & Recommendations:** Identify potential areas of difficulty based on the score distribution and suggest one or two recommendations for the instructors.
+            `;
+            const apiKey = ""; // API key will be injected here.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) { throw new Error(`API error: ${response.statusText}`); }
+
+                const result = await response.json();
+                let text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    // Basic markdown to HTML conversion
+                    text = text.replace(/### (.*)/g, '<h3 class="text-md font-semibold mt-4 mb-2">$1</h3>');
+                    text = text.replace(/## (.*)/g, '<h2 class="text-lg font-bold mt-4 mb-2">$1</h2>');
+                    text = text.replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>');
+                    text = text.replace(/\* (.*)/g, (match, p1) => `<li class="ml-5 list-disc">${p1}</li>`);
+                    text = text.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+
+                    analysisContent.innerHTML = text;
+                } else {
+                    analysisContent.innerHTML = "<p>Could not generate an analysis. Please try again.</p>";
+                }
+
+            } catch (error) {
+                console.error("Error analyzing results:", error);
+                analysisContent.innerHTML = "<p>Failed to generate analysis due to a network or API error.</p>";
+            }
+        }
+
+
+        // --- Authentication & Main App HTML ---
+        function renderFullApp() {
+            appRoot.innerHTML = `
+                <div class="flex h-screen overflow-hidden">
+                    <aside id="sidebar" class="sidebar w-64 bg-white flex-shrink-0 border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-30 md:relative md:translate-x-0 transform -translate-x-full">
+                        <div class="flex items-center space-x-3 p-4 border-b border-gray-200 h-16">
+                            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i data-lucide="graduation-cap" class="text-white"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-lg font-bold text-gray-800">CampOS</h1>
+                                <p class="text-xs text-gray-500">ERP Portal</p>
+                            </div>
+                        </div>
+                        <nav id="sidebar-nav" class="flex-1 p-4 space-y-1 overflow-y-auto"></nav>
+                    </aside>
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between flex-shrink-0 z-20 h-16">
+                            <div class="flex items-center space-x-4">
+                                <button id="menu-toggle" class="md:hidden text-gray-600"><i data-lucide="menu"></i></button>
+                                <div id="breadcrumb"><span class="font-semibold text-xl text-gray-800">Dashboard</span></div>
+                            </div>
+                            <div class="flex items-center space-x-5">
+                                <div class="relative">
+                                    <button id="notification-btn" class="relative text-gray-500 hover:text-blue-600">
+                                        <i data-lucide="bell" class="w-6 h-6"></i>
+                                        <span id="notification-badge" class="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold"></span>
+                                    </button>
+                                    <div id="notification-panel" class="dropdown-content mt-2 w-80 p-2"></div>
+                                </div>
+                                <div class="relative">
+                                    <button id="profile-btn" class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <span class="text-blue-600 font-bold">${(currentUser.name.split(' ')[0][0] || '') + (currentUser.name.split(' ')[1]?.[0] || '')}</span>
+                                        </div>
+                                        <div class="text-left hidden sm:block">
+                                            <p class="text-sm font-semibold text-gray-800">${currentUser.name}</p>
+                                            <p class="text-xs text-gray-500">${currentUser.role}</p>
+                                        </div>
+                                    </button>
+                                    <div id="profile-dropdown" class="dropdown-content mt-2">
+                                        <a href="#/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                        <div class="border-t border-gray-100"></div>
+                                        <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                        <main id="main-content" class="flex-1 p-6 overflow-y-auto bg-gray-50"></main>
+                    </div>
+                </div>
+            `;
+            // Re-assign global variables for ERP
+            mainContent = document.getElementById('main-content');
+            breadcrumb = document.getElementById('breadcrumb');
+            sidebarNav = document.getElementById('sidebar-nav');
+
+            // Re-initialize ERP functionalities
+            renderSidebar();
+            renderNotifications();
+            addERPEventListeners();
+            router();
+        }
+
+        // --- STUDENT-SPECIFIC RENDER FUNCTIONS ---
+        function renderStudentDashboard() {
+            const student = MOCK_DATA.students.find(s => s.id === currentUser.studentId);
+            const studentAttendance = MOCK_DATA.attendance.filter(a => a.studentId === currentUser.studentId);
+            const overallAttendance = studentAttendance.reduce((acc, curr) => {
+                acc.total += curr.total;
+                acc.attended += curr.attended;
+                return acc;
+            }, { total: 0, attended: 0 });
+            const attendancePercentage = overallAttendance.total > 0 ? Math.round((overallAttendance.attended / overallAttendance.total) * 100) : 0;
+
+            const myResults = MOCK_DATA.examRecords.filter(r => r.studentId === currentUser.studentId).slice(0, 5);
+            const myFees = MOCK_DATA.feePayments.filter(p => p.studentId === currentUser.studentId);
+            const totalPaid = myFees.filter(p => p.status === 'Completed').reduce((sum, p) => sum + Number(p.amount), 0);
+            const totalPending = myFees.filter(p => p.status === 'Pending').reduce((sum, p) => sum + Number(p.amount), 0);
+            const visibleNotifications = MOCK_DATA.notifications.filter(n => n.studentId === 'all' || n.studentId === currentUser.studentId).slice(0, 3);
+
+            return `<div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl border flex items-center space-x-6">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="user" class="w-10 h-10 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">Welcome, ${student.name.split(' ')[0]}!</h1>
+                        <p class="text-gray-500 mt-1">${student.course} - Semester ${student.semester}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card bg-white p-6 rounded-xl border">
+                        <h3 class="font-semibold mb-4 text-gray-700">Overall Attendance</h3>
+                        <div class="flex items-center justify-center space-x-4">
+                             <div class="relative w-28 h-28">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" stroke-width="3"></path>
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${attendancePercentage < 75 ? 'var(--error)' : 'var(--secondary)'}" stroke-width="3" stroke-dasharray="${attendancePercentage}, 100" transform="rotate(90 18 18)"></path>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold">${attendancePercentage}%</div>
+                            </div>
+                            <div class="text-sm">
+                                <p><strong class="font-semibold">Total Classes:</strong> ${overallAttendance.total}</p>
+                                <p><strong class="font-semibold">Attended:</strong> ${overallAttendance.attended}</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="card bg-white p-6 rounded-xl border">
+                         <h3 class="font-semibold mb-4 text-gray-700">Fee Status</h3>
+                         <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center"><span>Total Paid:</span><span class="font-bold text-lg text-green-600">₹${totalPaid.toLocaleString()}</span></div>
+                             <div class="flex justify-between items-center"><span>Pending Dues:</span><span class="font-bold text-lg text-red-600">₹${totalPending.toLocaleString()}</span></div>
+                         </div>
+                         <a href="#/fee-status" class="mt-6 block text-center w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 hover:shadow-lg">View Details</a>
+                     </div>
+                     <div class="card bg-white p-6 rounded-xl border">
+                        <h3 class="font-semibold mb-4 text-gray-700">Recent Notifications</h3>
+                        <div class="space-y-3">
+                        ${visibleNotifications.length > 0 ? visibleNotifications.map(n => `<div class="text-sm p-3 bg-gray-50 rounded-lg border border-gray-200">${n.message}</div>`).join('') : '<p class="text-sm text-gray-500 text-center py-4">No new notifications.</p>'}
+                        </div>
+                     </div>
+                </div>
+                 <div class="card bg-white rounded-xl border overflow-hidden">
+                    <h3 class="font-semibold p-6 text-gray-700">My Recent Results</h3>
+                     ${renderTable(['Exam', 'Subject', 'Marks', 'Grade'], myResults, (res) => {
+                const exam = MOCK_DATA.examinations.find(e => e.id === res.examinationId);
+                const grade = exam ? calculateGrade(res.marksObtained, exam.maxMarks) : 'N/A';
+                return `
+                            <td class="px-6 py-4">${exam ? exam.name : 'N/A'}</td>
+                            <td class="px-6 py-4">${exam ? exam.subject : 'N/A'}</td>
+                            <td class="px-6 py-4">${res.marksObtained}/${exam.maxMarks}</td>
+                            <td class="px-6 py-4 font-bold text-green-700">${grade}</td>
+                         `;
+            })}
+                </div>
+            </div>`;
+        }
+
+        function renderStudentResults() {
+            const myResults = MOCK_DATA.examRecords.filter(r => r.studentId === currentUser.studentId);
+            return `<div class="space-y-6">
+                <h2 class="text-2xl font-bold">My Examination Results</h2>
+                 ${renderTable(['Exam', 'Subject', 'Date', 'Marks', 'Grade', 'Result', 'Actions'], myResults, (res) => {
+                const exam = MOCK_DATA.examinations.find(e => e.id === res.examinationId);
+                const grade = exam ? calculateGrade(res.marksObtained, exam.maxMarks) : 'N/A';
+                const resultStatus = exam ? calculateResultStatus(res.marksObtained, exam.maxMarks) : 'N/A';
+                const statusClass = resultStatus === 'Pass' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                return `
+                            <td class="px-6 py-4">${exam ? exam.name : 'N/A'}</td>
+                            <td class="px-6 py-4">${exam ? exam.subject : 'N/A'}</td>
+                             <td class="px-6 py-4">${exam.date}</td>
+                            <td class="px-6 py-4">${res.marksObtained}/${exam.maxMarks}</td>
+                            <td class="px-6 py-4 font-bold">${grade}</td>
+                             <td><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${statusClass}">${resultStatus}</span></td>
+                             <td><button data-modal-target="marksheet-modal" data-result-id="${res.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="View Marksheet"><i data-lucide="file-text" class="w-4 h-4"></i></button></td>
+                         `;
+            })}
+            </div>`;
+        }
+
+        function renderStudentAttendance() {
+            const studentAttendance = MOCK_DATA.attendance.filter(a => a.studentId === currentUser.studentId);
+            return `<div class="space-y-6">
+                <h2 class="text-2xl font-bold">My Attendance</h2>
+                <div class="card bg-white p-6 rounded-xl border">
+                     ${studentAttendance.length > 0 ? studentAttendance.map(att => {
+                const percentage = att.total > 0 ? Math.round((att.attended / att.total) * 100) : 0;
+                const isDefaulter = percentage < 75;
+                return `<div class="mb-4">
+                            <div class="flex justify-between items-center text-md mb-2">
+                                <span class="font-medium text-gray-700">${att.subject}</span>
+                                <div class="flex items-center space-x-3">
+                                 ${isDefaulter ? `<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Defaulter</span>` : ''}
+                                <span class="text-sm ${isDefaulter ? 'text-red-600' : 'text-green-600'} font-semibold">${percentage}% (${att.attended}/${att.total})</span>
+                                </div>
+                            </div>
+                            <div class="bg-gray-200 rounded-full h-2.5">
+                                <div class="h-2.5 rounded-full ${isDefaulter ? 'bg-red-500' : 'bg-green-500'}" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>`
+            }).join('') : '<p class="text-center text-gray-500 py-8">No attendance records found.</p>'}
+                </div>
+            </div>`;
+        }
+
+        function renderStudentReportCard() {
+            const student = MOCK_DATA.students.find(s => s.id === currentUser.studentId);
+            const myResults = MOCK_DATA.examRecords.filter(r => r.studentId === currentUser.studentId);
+
+            const semesters = [...new Set(myResults.map(r => {
+                const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                return exam ? exam.semester : null;
+            }))].filter(s => s !== null).sort((a, b) => a - b);
+
+            const reportCardHtml = semesters.map(semester => {
+                const semesterResults = myResults.filter(r => {
+                    const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                    return exam && exam.semester === semester;
+                });
+
+                const totalMarks = semesterResults.reduce((acc, r) => acc + r.marksObtained, 0);
+                const totalMaxMarks = semesterResults.reduce((acc, r) => {
+                    const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                    return acc + (exam ? exam.maxMarks : 0);
+                }, 0);
+                const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
+
+                return `
+                <div class="card bg-white p-8 rounded-xl border mb-6">
+                     <h3 class="text-xl font-bold mb-4">Semester ${semester}</h3>
+                     ${renderTable(['Subject', 'Exam', 'Marks Obtained', 'Max Marks', 'Grade'], semesterResults, r => {
+                    const exam = MOCK_DATA.examinations.find(e => e.id === r.examinationId);
+                    const grade = calculateGrade(r.marksObtained, exam.maxMarks);
+                    return `<td class="px-6 py-4">${exam.subject}</td>
+                                 <td class="px-6 py-4">${exam.name}</td>
+                                 <td class="px-6 py-4">${r.marksObtained}</td>
+                                 <td class="px-6 py-4">${exam.maxMarks}</td>
+                                 <td class="px-6 py-4 font-bold">${grade}</td>`;
+                })}
+                     <div class="mt-6 flex justify-end">
+                        <div class="w-full max-w-xs space-y-2 text-sm">
+                             <div class="flex justify-between font-semibold"><span class="text-gray-600">Semester Total:</span><span>${totalMarks}/${totalMaxMarks}</span></div>
+                             <div class="flex justify-between font-bold text-lg"><span class="text-gray-800">Semester Percentage:</span><span class="text-blue-600">${percentage}%</span></div>
+                        </div>
+                     </div>
+                </div>`;
+            }).join('');
+
+            return `<div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Academic Report Card</h2>
+                    <button id="print-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"><i data-lucide="printer" class="w-5 h-5"></i><span>Print</span></button>
+                </div>
+                <div class="printable-area">
+                    <div class="bg-white p-8 rounded-xl border mb-6">
+                        <div class="text-center border-b pb-4 mb-4">
+                            <h2 class="text-2xl font-bold text-blue-600">CampOS University</h2>
+                            <p class="text-lg font-semibold text-gray-700">Consolidated Statement of Marks</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm my-6">
+                            <div><strong class="text-gray-500">Student Name:</strong> ${student.name}</div>
+                            <div><strong class="text-gray-500">Student ID:</strong> ${student.id}</div>
+                            <div><strong class="text-gray-500">Course:</strong> ${student.course}</div>
+                            <div><strong class="text-gray-500">Current Semester:</strong> ${student.semester}</div>
+                        </div>
+                    </div>
+                    ${reportCardHtml.length > 0 ? reportCardHtml : '<p class="text-center text-gray-500 py-8">No exam results available to generate a report card.</p>'}
+                </div>
+            </div>`;
+        }
+
+        function renderStudentFeeStatus() {
+            const myFees = MOCK_DATA.feePayments.filter(p => p.studentId === currentUser.studentId);
+            return `<div class="space-y-6">
+                 <h2 class="text-2xl font-bold">My Fee Payments</h2>
+                  ${renderTable(
+                ['Receipt ID', 'Amount', 'Mode', 'Date', 'Status', 'Actions'],
+                myFees,
+                p => {
+                    let actionsHtml = '';
+                    if (p.status === 'Completed') {
+                        actionsHtml = `<button data-modal-target="fee-receipt-modal" data-payment-id="${p.id}" class="modal-open-btn p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"><i data-lucide="file-text" class="w-4 h-4"></i></button>`;
+                    } else {
+                        actionsHtml = `<span class="text-xs text-yellow-700">Pending</span>`
+                    }
+                    return `<td class="px-6 py-4 font-mono text-xs">${p.receipt}</td>
+                                <td class="px-6 py-4 font-medium">₹${Number(p.amount).toLocaleString('en-IN')}</td>
+                                <td class="px-6 py-4">${p.mode || 'N/A'}</td>
+                                <td class="px-6 py-4">${p.date}</td>
+                                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${p.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${p.status}</span></td>
+                                <td class="px-6 py-4 text-left">${actionsHtml}</td>`
+                }
+            )}
+             </div>`;
+        }
+
+        function renderStudentProfile() {
+            const student = MOCK_DATA.students.find(s => s.id === currentUser.studentId);
+            return `<div class="max-w-4xl mx-auto space-y-6">
+                 <h2 class="text-2xl font-bold">My Profile</h2>
+                 <div class="card bg-white p-8 rounded-xl border grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1 text-center">
+                        <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
+                            <i data-lucide="user" class="w-16 h-16 text-gray-500"></i>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 space-y-5 text-sm">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><strong class="text-gray-500 block mb-1">Full Name</strong> ${student.name}</div>
+                            <div><strong class="text-gray-500 block mb-1">Student ID</strong> ${student.id}</div>
+                        </div>
+                         <div class="grid grid-cols-2 gap-4">
+                            <div><strong class="text-gray-500 block mb-1">Email</strong> ${student.email}</div>
+                             <div><strong class="text-gray-500 block mb-1">Date of Birth</strong> ${student.dob}</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><strong class="text-gray-500 block mb-1">Course</strong> ${student.course}</div>
+                            <div><strong class="text-gray-500 block mb-1">Current Semester</strong> ${student.semester}</div>
+                        </div>
+                         <div><strong class="text-gray-500 block mb-1">Admission Status</strong> <span class="font-medium text-green-600">${student.status}</span></div>
+                    </div>
+                 </div>
+            </div>`;
+        }
+
+
+        // --- Authentication Rendering ---
+        function renderLoginPage() {
+            appRoot.innerHTML = `
+            <div id="auth-container">
+                <div class="auth-card">
+                    <div class="text-center mb-8 auth-logo">
+                        <div class="inline-block p-3 bg-blue-100 rounded-full">
+                            <i data-lucide="graduation-cap" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mt-4">CampOS Portal</h1>
+                        <p class="text-gray-500">Sign in to continue</p>
+                    </div>
+                    <form id="login-form" class="space-y-6">
+                        <div class="input-group">
+                            <input type="text" id="username" required class="auth-input" placeholder="Username / Student ID">
+                            <i data-lucide="user" class="input-icon w-5 h-5"></i>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="password" required class="auth-input" placeholder="Password">
+                            <i data-lucide="lock" class="input-icon w-5 h-5"></i>
+                        </div>
+                        <div class="text-right text-sm">
+                            <a href="#" id="show-forgot-password" class="font-medium text-blue-600 hover:underline">Forgot password?</a>
+                        </div>
+                        <div id="login-error" class="text-red-500 text-sm text-center hidden"></div>
+                        <button type="submit" class="auth-button">Login</button>
+                    </form>
+                    <p class="text-center text-sm text-gray-600 mt-8">
+                        Don't have an account? <a href="#" id="show-register" class="font-medium text-blue-600 hover:underline">Register here</a>
+                    </p>
+                </div>
+            </div>
+            `;
+            document.getElementById('show-register').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderRegisterPage();
+            });
+            document.getElementById('show-forgot-password').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderForgotPasswordPage();
+            });
+            lucide.createIcons();
+        }
+
+        function renderRegisterPage() {
+            appRoot.innerHTML = `
+            <div id="auth-container">
+                <div class="auth-card">
+                     <div class="text-center mb-8 auth-logo">
+                         <div class="inline-block p-3 bg-blue-100 rounded-full">
+                            <i data-lucide="user-plus" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mt-4">Create Account</h1>
+                        <p class="text-gray-500">For students with approved admissions</p>
+                    </div>
+                    <form id="register-form" class="space-y-4">
+                        <div class="input-group">
+                            <input type="text" id="applicationId" placeholder="Admission App ID" required class="auth-input">
+                            <i data-lucide="file-text" class="input-icon w-5 h-5"></i>
+                        </div>
+                         <div class="input-group">
+                            <input type="email" id="email" placeholder="Registered Email" required class="auth-input">
+                             <i data-lucide="mail" class="input-icon w-5 h-5"></i>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="password" placeholder="Create Password" required class="auth-input">
+                            <i data-lucide="lock" class="input-icon w-5 h-5"></i>
+                        </div>
+                        <div id="register-error" class="text-red-500 text-sm text-center pt-2 hidden"></div>
+                        <div id="register-success" class="text-green-600 text-sm text-center pt-2 hidden"></div>
+                        <button type="submit" class="auth-button mt-4">Register</button>
+                    </form>
+                    <p class="text-center text-sm text-gray-600 mt-8">
+                        Already have an account? <a href="#" id="show-login" class="font-medium text-blue-600 hover:underline">Login here</a>
+                    </p>
+                </div>
+            </div>
+            `;
+            document.getElementById('show-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderLoginPage();
+            });
+            lucide.createIcons();
+        }
+
+        function renderForgotPasswordPage() {
+            appRoot.innerHTML = `
+            <div id="auth-container">
+                <div class="auth-card">
+                    <div class="text-center mb-8 auth-logo">
+                         <div class="inline-block p-3 bg-blue-100 rounded-full">
+                            <i data-lucide="key-round" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mt-4">Reset Password</h1>
+                        <p class="text-gray-500">Retrieve your password below</p>
+                    </div>
+                    <form id="forgot-password-form" class="space-y-6">
+                         <div class="input-group">
+                            <input type="text" id="username" required class="auth-input" placeholder="Username / Student ID">
+                             <i data-lucide="user" class="input-icon w-5 h-5"></i>
+                        </div>
+                        <div id="forgot-error" class="text-red-500 text-sm text-center hidden"></div>
+                        <div id="forgot-success" class="text-green-600 text-sm text-center hidden"></div>
+                        <button type="submit" class="auth-button">Retrieve Password</button>
+                    </form>
+                    <p class="text-center text-sm text-gray-600 mt-8">
+                        Remembered it? <a href="#" id="show-login" class="font-medium text-blue-600 hover:underline">Back to Login</a>
+                    </p>
+                </div>
+            </div>
+            `;
+            document.getElementById('show-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                renderLoginPage();
+            });
+        }
+
+
+        // --- Authentication Logic ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            const user = MOCK_DATA.users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                renderFullApp();
+            } else {
+                errorDiv.textContent = 'Invalid username or password.';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const appId = document.getElementById('applicationId').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('register-error');
+            const successDiv = document.getElementById('register-success');
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+
+            const admission = MOCK_DATA.admissions.find(a => a.id === appId && a.email === email);
+
+            if (!admission) {
+                errorDiv.textContent = 'No matching admission record found.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (admission.status !== 'Approved') {
+                errorDiv.textContent = 'Your admission is not yet approved.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const student = MOCK_DATA.students.find(s => s.email === email);
+            if (!student) {
+                errorDiv.textContent = 'Student record not found. Please contact administration.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const existingUser = MOCK_DATA.users.find(u => u.username === student.id);
+            if (existingUser) {
+                errorDiv.textContent = 'An account for this student ID already exists.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                id: MOCK_DATA.users.length + 1,
+                username: student.id,
+                password: password,
+                role: 'Student',
+                name: student.name,
+                email: student.email,
+                status: 'Active',
+                created: new Date().toISOString().split('T')[0],
+                studentId: student.id
+            };
+            MOCK_DATA.users.push(newUser);
+            saveData();
+
+            successDiv.innerHTML = `Registration successful! Your Student ID is <strong>${student.id}</strong>. You can now log in.`;
+            successDiv.classList.remove('hidden');
+            e.target.reset();
+        }
+
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const errorDiv = document.getElementById('forgot-error');
+            const successDiv = document.getElementById('forgot-success');
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+
+            const user = MOCK_DATA.users.find(u => u.username === username);
+
+            if (user) {
+                successDiv.innerHTML = `Password for ${username} is: <strong>${user.password}</strong>`;
+                successDiv.classList.remove('hidden');
+            } else {
+                errorDiv.textContent = 'No user found with that username or Student ID.';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            window.location.hash = '';
+            renderLoginPage();
+        }
+
+        // --- Initial Setup ---
+        function addERPEventListeners() {
+            document.getElementById('menu-toggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            });
+            document.getElementById('notification-btn').addEventListener('click', () => {
+                document.getElementById('notification-panel').classList.toggle('show');
+                document.getElementById('profile-dropdown').classList.remove('show');
+            });
+
+            document.getElementById('profile-btn').addEventListener('click', () => {
+                document.getElementById('profile-dropdown').classList.toggle('show');
+                document.getElementById('notification-panel').classList.remove('show');
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+
+            // Hide dropdowns when clicking outside
+            window.addEventListener('click', (e) => {
+                const notificationBtn = document.getElementById('notification-btn');
+                const profileBtn = document.getElementById('profile-btn');
+                if (notificationBtn && !notificationBtn.contains(e.target) && !document.getElementById('notification-panel').contains(e.target)) {
+                    document.getElementById('notification-panel').classList.remove('show');
+                }
+                if (profileBtn && !profileBtn.contains(e.target) && !document.getElementById('profile-dropdown').contains(e.target)) {
+                    document.getElementById('profile-dropdown').classList.remove('show');
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                renderFullApp();
+            } else {
+                renderLoginPage();
+            }
+
+            window.addEventListener('hashchange', router);
+
+            // Listen for storage changes to sync data across tabs
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'campOSData') {
+                    MOCK_DATA = getInitialData();
+                    if (currentUser) {
+                        // Re-render notifications and current page to reflect changes
+                        renderNotifications();
+                        refreshCurrentPage();
+                    }
+                }
+            });
+
+            // Delegated event listener for all dynamic content
+            document.body.addEventListener('click', function (e) {
+                // This will only fire if the ERP is loaded
+                if (!currentUser) return;
+
+                const modalBtn = e.target.closest('.modal-open-btn');
+                if (modalBtn) {
+                    e.preventDefault();
+                    const modalId = modalBtn.dataset.modalTarget;
+                    const modalData = {
+                        roomId: modalBtn.dataset.roomId,
+                        studentId: modalBtn.dataset.studentId,
+                        paymentId: modalBtn.dataset.paymentId,
+                        examId: modalBtn.dataset.examId,
+                        resultId: modalBtn.dataset.resultId,
+                        attendanceId: modalBtn.dataset.attendanceId,
+                    };
+                    openModal(modalId, modalData);
+                    return;
+                }
+
+                const approveBtn = e.target.closest('.approve-btn');
+                if (approveBtn) {
+                    e.preventDefault();
+                    handleAdmissionAction(approveBtn.dataset.admissionId, 'approve');
+                    return;
+                }
+
+                const declineBtn = e.target.closest('.decline-btn');
+                if (declineBtn) {
+                    e.preventDefault();
+                    handleAdmissionAction(declineBtn.dataset.admissionId, 'decline');
+                    return;
+                }
+
+                const cancelBtn = e.target.closest('.cancel-admission-btn');
+                if (cancelBtn) {
+                    e.preventDefault();
+                    handleCancelAdmission(cancelBtn.dataset.studentId);
+                    return;
+                }
+
+                const checkoutBtn = e.target.closest('.checkout-btn');
+                if (checkoutBtn) {
+                    e.preventDefault();
+                    handleCheckout(checkoutBtn.dataset.allocationId);
+                    return;
+                }
+
+                const returnBtn = e.target.closest('.return-btn');
+                if (returnBtn) {
+                    e.preventDefault();
+                    handleReturnBook(returnBtn.dataset.bookId);
+                    return;
+                }
+
+                const renewBtn = e.target.closest('.renew-btn');
+                if (renewBtn) {
+                    e.preventDefault();
+                    handleRenewBook(renewBtn.dataset.bookId);
+                    return;
+                }
+
+                const deleteNotificationBtn = e.target.closest('.delete-notification-btn');
+                if (deleteNotificationBtn) {
+                    e.preventDefault();
+                    const id = parseInt(deleteNotificationBtn.dataset.notificationId, 10);
+                    MOCK_DATA.notifications = MOCK_DATA.notifications.filter(n => n.id !== id);
+                    renderNotifications();
+                    if (window.location.hash === '#/' || window.location.hash === '') {
+                        refreshCurrentPage();
+                    }
+                    return;
+                }
+                const deleteScheduleBtn = e.target.closest('.delete-schedule-btn');
+                if (deleteScheduleBtn) {
+                    e.preventDefault();
+                    handleDeleteSchedule(deleteScheduleBtn.dataset.examId);
+                    return;
+                }
+                const deleteResultBtn = e.target.closest('.delete-result-btn');
+                if (deleteResultBtn) {
+                    e.preventDefault();
+                    handleDeleteResult(deleteResultBtn.dataset.resultId);
+                    return;
+                }
+
+                const deleteAttendanceBtn = e.target.closest('.delete-attendance-btn');
+                if (deleteAttendanceBtn) {
+                    e.preventDefault();
+                    const id = deleteAttendanceBtn.dataset.attendanceId;
+                    MOCK_DATA.attendance = MOCK_DATA.attendance.filter(a => a.id !== id);
+                    saveData();
+                    refreshCurrentPage();
+                    return;
+                }
+
+                const generateRemarkBtn = e.target.closest('.generate-remark-btn');
+                if (generateRemarkBtn) {
+                    e.preventDefault();
+                    handleGenerateRemark(generateRemarkBtn.dataset.resultId);
+                    return;
+                }
+
+                const suggestBtn = e.target.closest('#suggest-message-btn');
+                if (suggestBtn) {
+                    e.preventDefault();
+                    handleSuggestMessage();
+                    return;
+                }
+
+                const analyzeBtn = e.target.closest('.analyze-results-btn');
+                if (analyzeBtn) {
+                    e.preventDefault();
+                    handleAnalyzeResults(analyzeBtn.dataset.examId);
+                    return;
+                }
+
+                const clearFiltersBtn = e.target.closest('#clear-filters-btn');
+                if (clearFiltersBtn) {
+                    e.preventDefault();
+                    examFilters.examName = 'all';
+                    examFilters.resultStatus = 'all';
+                    refreshCurrentPage();
+                    return;
+                }
+            });
+
+            // Add listener for authentication forms
+            document.body.addEventListener('submit', function (e) {
+                if (e.target.id === 'login-form') {
+                    handleLogin(e);
+                } else if (e.target.id === 'register-form') {
+                    handleRegister(e);
+                } else if (e.target.id === 'forgot-password-form') {
+                    handleForgotPassword(e);
+                } else if (e.target.id === 'broadcast-form') {
+                    e.preventDefault();
+                    handleAddNotificationSubmit(e);
+                }
+            });
+
+            document.body.addEventListener('change', function (e) {
+                if (e.target.id === 'exam-name-filter' || e.target.id === 'result-status-filter') {
+                    examFilters.examName = document.getElementById('exam-name-filter').value;
+                    examFilters.resultStatus = document.getElementById('result-status-filter').value;
+                    refreshCurrentPage();
+                }
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>
